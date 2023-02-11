@@ -1,5 +1,5 @@
 #ignore everything
-* 
+.*
 
 
 #ignore these for sure!
@@ -13,8 +13,8 @@ build/
 
 # not ignore
 !.gitignore
-!*/
 !*.tex
+!*.pdf
 
 !*.png
 !*.sty 
