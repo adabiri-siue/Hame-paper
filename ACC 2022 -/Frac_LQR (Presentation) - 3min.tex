@@ -1,0 +1,148 @@
+
+\documentclass[
+rightlogo=images/presentation/acc2020,
+leftlogo=images/presentation/siue.png,
+leftbottomlogo=images/presentation/adroco
+]{ad-conference}
+
+\definecolor{rightcolor}{RGB}{0,0,0}
+\definecolor{leftcolor}{RGB}{102,45,145}
+
+
+\title[Advanced Dynamics, Robotics, and Control Research Laboratory]
+{
+	Closed-form Solution for The Finite-horizon Linear-quadratic Control Problem of Linear Fractional-order Systems \\ (3 mins)
+} 
+
+\author[\tiny{Advanced Dynamics, Robotics, and Control Research Laboratory}]
+{
+	Arman Dabiri\inst{1} \and 
+	Laya Karimi Chahrogh \inst{2} \and 
+	J. A. Tenreiro Machado \inst{3}}
+
+
+\institute[Southern Illinois University Edwardsville]{
+	\inst{1} Department of Mechanical and Mechatronics Engineering of Southern Illinois University Edwardsville \and %
+	\inst{2} Department of Computer Science of Southern Illinois University Edwardsville \and
+	\inst{3} Department of Electrical Engineering of Institute of Engineering, Polytechnic Institute of Porto \and
+}
+
+
+\date{May 25, 2021}
+
+
+\bibliography{GeneralBib_2020_09_28}
+
+
+
+
+\begin{document}
+
+%%%====================================================
+\begin{frame}
+\titlepage	
+\end{frame}
+
+
+\section{Problem Statement}
+\subsection{Fractional Optimal Control Problem (FOCP)}
+\begin{frame}
+	\begin{block}{Fractional Optimal Control Problem (FOCP)}
+		Consider the LTI-FO system
+		\begin{flalign}\label{eq:fLTI}
+			{_{t_0}^{C} \mathcal D^{\alpha}_t \x(t)}&=A\x(t) + B \u(t)
+		\end{flalign}
+		with the initial condition $ \mathbf x(t_0)=\mathbf x_0 $, where $ t\in [t_0,t_f] $, $ \mathbf x(t)=[x_1(t),\ldots,x_n(t)]^T$, $ x_i(t)\in\mathbb R $, $ A\in \mathbb R^{n\times n}$, $ B\in \mathbb R^{n\times m}$, and $ \mathbf u(t) \in \mathbb R^m$.
+		
+		The control input $ \mathbf u(t) $ in Eq.~(\ref{eq:fLTI}) should be obtained such that minimizes the quadratic performance index
+		\begin{flalign}\label{eq:cost}
+			\min\limits_{\u(t)} \; \mathcal L=\frac{1}{2} \x^T(t_f)F(t_f)\x(t_f)
+			\frac{1}{2}\int_{t_0}^{t_f} \parp{\x^T(t) Q \x(t)+\u^T(t) R \u(t)}\;dt,
+		\end{flalign}
+		where $ \x^T(t_f)F(t_f)\x(t_f) $ is the terminal cost; $ F(t_f)\in\mathbb R^{n \times n} $, $ Q\in\mathbb R^{n \times n} $ is a symmetric positive semidefinite matrix defining the energy of the controlled output, and $ R\in\mathbb R^{m \times m} $ is a symmetric positive definite matrix defining the energy of the control input.
+	\end{block}
+\end{frame}
+
+
+\begin{frame}
+	\begin{blockr}{\circled{$ \mathcal C $} Previous problems of solving linear fractional-order control problems}
+		\begin{enumerate}
+			\item There was no method that can obtain the optimal solution in the closed-form
+			\item The current methods require NLP programming to solve even a simple FOCP. 
+			\item The current methods suffers from the linear convergence in the solution.
+		\end{enumerate}
+	\end{blockr}
+	\pause
+	\begin{blockb}{\circled{$ \mathcal P $} The proposed method}
+		\begin{enumerate}
+			\item The optimal solution is given explicitly and in a closed form.
+			\item It does not need any NLP programming techniques.
+			\item The optimal solution has spectral convergence.
+		\end{enumerate}
+	\end{blockb}
+	
+\end{frame}
+
+\subsection{Issue of Solving FOCP}
+\begin{frame}[shrink=5]
+	\begin{block}{An Unsovable LQR Problem for LTI-FO Systems!!}
+		Let us introduce a new cost function using the Lagrange multiplier $ \boldsymbol{\lambda}(t) $ such that $ \mathcal L^* $ vanishes along the optimum trajectory. That is
+		\begin{flalign}\label{eq:J}\nonumber
+			&\mathcal L^*= \frac{1}{2}\x^T(t_f)F(t_f)\x(t_f)+
+			\nonumber\\
+			&\int_{t_0}^{t_f} \Bigg(\frac{1}{2}\parp{\x^T(t) Q \x(t)+\u^T(t) R \u(t)}+
+			\boldsymbol{\lambda}^T(t)\parp{A\x(t) + B \u(t)-{_{t_0}^{C} \mathcal D^{\alpha}_t \x(t)}}\Bigg)\;dt.
+		\end{flalign}
+	Using the integration by parts yields
+	\begin{subequations}\label{eq:cond}
+		\begin{flalign}
+			& _{t}^{C} \mathcal D^{\alpha}_{t_f} \boldsymbol{\lambda}(t) = A^T\boldsymbol{\lambda}(t)+Q\x(t)  ,
+			\\	
+			&\u(t) =- R^{-1}B^T\boldsymbol{\lambda}(t),
+			\\  
+			&\x(t_f)^TF(t_f)\delta \x(t_f)=\parb{\parp{_{t_0}\mathcal{J}^{1-\alpha}_t \boldsymbol{\lambda}^T(t)}\; \delta\x(t)}_{t=t_0}^{t=t_f}.
+		\end{flalign}
+	\end{subequations}
+	\end{block}
+\end{frame}
+
+
+\begin{frame}[shrink=10]
+	\begin{block}{}
+		Since the initial condition $ \x(t_0) $ does not change, it gives
+		\begin{equation}\label{eq:cond1}
+			_{t_0}\mathcal{J}^{1-\alpha}_t \boldsymbol{\lambda}^T(t_f)= \x(t_f)^TF(t_f).
+		\end{equation}
+	\end{block}
+
+	\begin{blockB}{}
+		One can see that solving Eqs.~(\ref{eq:cond}) and (\ref{eq:cond1}) is \textbf{laborious} and \textbf{impossible} in general. 
+	\end{blockB}
+	\begin{blockr}{}	
+		Assuming $ \boldsymbol{\lambda}(t)=P(t)\x(t) $ does not help since the Riccati type equation is 
+		\begin{flalign}\label{key}\nonumber
+			&{_{t_0}^C\mathcal{D}^{\alpha}_t}P(t)\;\x(t)+\frac{(t-{t_0})^{-\alpha}}{\Gamma(1-\alpha)} P({t_0}) \parp{\x(t)-\x({t_0})}+
+			\\ \nonumber
+			&
+			\sum_{k=\ceil{\alpha}}^{\infty}
+			\begin{pmatrix}
+				\alpha \\
+				k
+			\end{pmatrix}
+			{_{t_0}^C\mathcal{D}^{k}_t}{P(t)}\;{_{t_0}\mathcal{J}^{k-\alpha}_t}{\x(t)}
+			= A^TP(t)\x(t)+Q\x(t),
+		\end{flalign}
+		which cannot be solved in practice. In literature, the last equation is simplified by considering many restrictive assumptions to obtain the similar algebraic Riccati equation for LTI systems.
+	\end{blockr}
+\end{frame}
+
+\section{}
+\section{}
+\section{}
+
+
+
+
+
+
+\end{document}

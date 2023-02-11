@@ -1,0 +1,127 @@
+\documentclass[letterpaper, 10 pt, conference]{ieeeconf} % Comment this line out if you need a4paper
+
+
+\IEEEoverridecommandlockouts % This command is only needed if 
+% you want to use the \thanks command
+
+\overrideIEEEmargins  % Needed to meet printer requirements.
+%--------------------------------------------------------------
+\usepackage{amsfonts, subfigure,tikz,physics,bbm,graphicx,color,xcolor,epstopdf,setspace, cite}
+
+\date{}
+
+\usepackage{hyperref}
+\hypersetup{
+	colorlinks,
+	linkcolor={blue!90!black},
+	citecolor={blue!90!black},
+	urlcolor={blue!80!black}
+}
+
+\def \bx{\mathbf x}
+\def \by{\mathbf y}
+\def \bz{\mathbf z}
+\def \bu{\mathbf u}
+\def \bv{\mathbf v}
+\def \bw{\mathbf w}
+
+\def \be{\mathbf e}
+\def \br{\mathbf r}
+
+\newcommand{\TR}[1]{\operatorname{Tr}\left[#1\right]}
+\newcommand{\EX}[1]{\mathbb{E}\left[#1\right]}
+\newtheorem{lem}{Lemma}[section]
+
+
+
+\newenvironment{armri}{\color{red}}{}
+\newcommand{\arm}[1]{\begin{armri}{#1}\end{armri}}
+
+\newenvironment{armri2}{\color{blue}}{}
+\newcommand{\armm}[1]{\begin{armri2}{#1}\end{armri2}}
+
+\newcommand\deq{\mathrel{\overset{\makebox[0pt]{\mbox{\normalfont\tiny\sffamily def}}}{=}}}
+\newcommand\defeq{\mathrel{\overset{\makebox[0pt]{\mbox{\normalfont\tiny\sffamily def}}}{=}}}
+\newcommand{\parb}[1]{\left[{#1}\right]} 
+\newcommand{\parp}[1]{\left({#1}\right)} 
+\newcommand{\parB}[1]{\{{#1}\}} 
+\newcommand{\ceil}[1]{\lceil{#1}\rceil} 
+\newcommand{\floor}[1]{\lfloor{#1}\rfloor} 
+
+\title{
+	\LARGE \bf{
+		Optimal quadratic control of linear systems with measurement noise and disturbances}
+}
+
+\author{Hamed Mozaffari$ ^{1} $ and Arman Dabiri$ ^{2} $
+	\thanks{ $ ^{1} $ Hamed Mozaffari is with the Departments of Mechanical \& Mechatronics Engineering, Southern Illinois University Edwardsville, Edwardsville, IL 62026, USA {\tt\small hmozaff@siue.edu}}
+	\thanks{ $ ^{2} $ Arman Dabiri is with the Departments of Mechanical \& Mechatronics Engineering, Southern Illinois University Edwardsville, Edwardsville, IL 62026, USA {\tt\small adabiri@siue.edu}}%
+}
+
+\allowdisplaybreaks
+
+\begin{document}
+
+
+
+\maketitle
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{abstract}
+	
+\end{abstract}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\vspace{.4cm}
+\section{Introduction}
+Linear-quadratic-regulator (LQR) problems have been dominantly used in the optimal control theory, where the concern is controlling a dynamic system at a minimum cost. Although LQR inheres robustness to some degree and often works for nondeterministic systems with uncertainties and noise, it is mainly established for deterministic systems without noise. Nevertheless, a control algorithm's performance is highly affected by measurement noise and input disturbances. This issue is addressed in the linear-quadratic-Gaussian (LQG) control problem, mainly concerned with linear dynamic systems driven by white Gaussian noise. Moreover, in LQG problems, the expected value of the cost function in the LQR problem is minimized to derive the optimal feedback control law. The main idea is to use a Kalman filter to minimize the estimation error, and design the control feedback separately, i.e., which is so-called  \emph{separation principle}. The LQG based controller only considered the effect of measurement noise and disturbances, and hence the estimated states, as deterministic signals, are considered in the the feedback control. The main question is ``if we consider the estimated states be non-deterministic, can we improve the error and input more?'' Any positive answer to this question results in minimizing the control errors as well as the energy consumption in the control.
+
+For this purpose, we simply define a new first-order 
+
+
+It helps us achieve lower control errors and lower input energy consumption. Similar to the Kalman filter approach, we develop a method to calculate the best controller gains to minimize the variance of control errors and inputs.  
+
+
+We compare the developed controller with LQG and model predictive controllers (MPC) through some simulation tests in the presence of noise and disturbances. The parameters of controllers have tunned so that the settling times and input norms of the different methods become similar. Tests results show that the devised controller has a 50\% smaller control error variance, and a 40\% lower control input  than the LQR and the model predictive controller (MPC); Finally, the computational time of the LQR and MPC is at least eight times bigger than the devised controller.  
+
+
+\section{Preliminaries}\label{sec:pre}
+Consider a discrete dynamic system described with the following state space
+\begin{equation}\label{eq:dss}
+	\begin{array}{ll}
+		\bx_{k+1}&=F_{k} \bx_{k}+G_k\bu_k+\bw_{k}, \\
+		\bz_{k}&=H_{k}  \bx_{k}+\bv_{k},
+	\end{array}
+\end{equation}
+where $ \bx_k \in \mathbb{R}^n $ is the state of the system at time $k$, $\bu_{k} \in \mathbb{R}^m $ is the system input, $F_{k}\in \mathbb{R}^{n\times n}$  is the state transition matrix, $\bw_{k}\in \mathbb{R}^{n}$ is the Gaussian zero-mean white noise with known covariance $ Q_k $, $\bz_{k}\in \mathbb{R}^{m}$ is the actual measurement of $ \bx_k$ at time $k$, $H_{k}\in \mathbb{R}^{m\times n}$ is the measurement matrix, and $\bv_{k}\in \mathbb{R}^{m}$ is the Gaussian zero-mean white noise denote the measurement error. 
+
+\begin{lem}\label{lem:trace}
+	Let $ \bx \in \mathbb{R}^n $ and $A\in \mathbb{R}^{n\times n}$. Then, we have
+	\begin{equation*}\label{key}
+		\bx A \bx^T \equiv \Tr{A\bx\bx^T }
+	\end{equation*}
+\end{lem}
+
+
+Let the cost function be defined as 
+\begin{equation}\label{eq:J}
+	J_k(\bx)=\EX{\bx_{k+1}^T q \bx_{k+1}+\bu_k^T r \bu_k}
+\end{equation}
+where $ q \in \mathbb{R}^{n \times n} $ and $ r  \in \mathbb{R}^{m \times m}$ are both positive.
+
+Using Lemma~\ref{lem:trace} and considering the fact that $ \TR{\cdot} $ and $ \EX{\cdot} $ can be exchanged, we have
+\begin{equation}\label{eq:J_s1}
+	J_k(\bx)=\TR{\EX{q \bx_{k+1} \bx_{k+1}^T+r \bu_k \bu_k^T}}.
+\end{equation}
+Substituting Eq.~(\ref{eq:dss}) into Eq.~(\ref{eq:J_s1}) yields
+\begin{equation}\label{key}
+	\begin{gathered}
+		J=\TR{q A \EX{\bx_k \bx_k^T} A^T+qB \EX{\bu_k \bu_k^T} B^T+q\EX{\bw_k \bw_k^T}+qA \EX{\bx_k \bu_k^T} B^T+qB \EX{\bu_k \bx_k^T} A^T+r \EX{\bu_k \bu_k^T}}
+	\end{gathered}
+\end{equation}
+
+\section{Conclusion}\label{sec:con}
+
+
+\bibliographystyle{ieeetr}
+\end{document}
+

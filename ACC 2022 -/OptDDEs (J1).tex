@@ -1,0 +1,973 @@
+\documentclass[journal]{IEEEtran}
+\usepackage{amsfonts,amsmath,amsthm,amssymb,mathtools,xparse, units,subfigure,multirow,booktabs,authblk,graphicx,arydshln , color,xcolor,epstopdf,setspace,tikz,hyperref,pgffor}
+
+\DeclareMathAlphabet{\mathpzc}{OT1}{pzc}{m}{it}
+
+\usetikzlibrary{matrix,positioning,decorations.pathreplacing}
+
+\newtheorem{thm}{Theorem}
+\newtheorem{lem}{Lemma}
+\newtheorem{prop}{Proposition}
+\newtheorem{cor}{Corollary}
+\newtheorem{property}{Property}
+\newtheorem{defn}{Definition}
+\newtheorem{conj}{Conjecture}
+\newtheorem{exmp}{Example}
+\newtheorem{expl}{Explanation}
+\newtheorem{rem}{Remark}
+\newtheorem{ass}{Assumption}
+\newtheorem{note}{Note}
+
+\def \disc { \mathpzc d}
+
+\hypersetup{
+ colorlinks,
+ linkcolor={blue!50!black},
+ citecolor={blue!50!black},
+ urlcolor={blue!80!black}
+}
+
+
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
+\NewDocumentCommand{\normL}{ s O{} m }{%
+ \IfBooleanTF{#1}{\norm*{#3}}{\norm[#2]{#3}}_{L_2(\Omega)}%
+}
+\newenvironment{armri}{\color{red}}{}
+\newcommand{\arm}[1]{\begin{armri}{#1}\end{armri}}
+
+\newenvironment{armbi}{\color{blue}}{}
+\newcommand{\armb}[1]{\begin{armbi}{#1}\end{armbi}}
+\newcommand{\parb}[1]{\left[{#1}\right]} 
+\newcommand{\parp}[1]{\left({#1}\right)} 
+\newcommand{\parB}[1]{\lbrace{#1}\rbrace} 
+\newcommand{\ceil}[1]{\lceil{#1}\rceil} 
+\newcommand{\floor}[1]{\lfloor{#1}\rfloor} 
+\newcommand{\V}[1]{{\bf{#1}}}
+\newcommand{\x}{{\V{x}}}
+
+
+\def \st {\operatorname{s.t.}\quad }
+\newcommand\tab[1][1cm]{\hspace*{#1}}
+\usepackage{geometry}
+\geometry{
+ a4paper,
+ total={170mm,257mm},
+ left=20mm,
+ top=20mm,
+}
+\providecommand{\keywords}[1]{\operatornamebf{\textit{keywords-- }} #1}
+
+
+\def\A{ \mathcal A }
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%\IEEEoverridecommandlockouts % This command is only needed if 
+% % you want to use the \thanks command
+%
+%\overrideIEEEmargins % Needed to meet printer requirements.
+
+
+\title{\LARGE \bf
+	Robust control of Linear Time-delay Systems using Optimal Probabilistic-Robust Controller with Memory}
+
+
+\author{
+ Roya Karimi\thanks{PhD Candidate, Systems and Industrial Engineering Department, University of Arizona, AZ, USA}
+ ,
+ Arman Dabiri\thanks{Assistant Professor, Mechanical Engineering Department, Eastern Michigan University, AZ, USA (corresponding author: Phone: 520-561-5612; {\tt\small armandabiri@email.arizona.edu})}
+, and
+ Jianqiang Cheng\thanks{Assistant Professor, Jianqiang Cheng, Systems and Industrial Engineering Department, University of Arizona, AZ, USA}
+ %, and 
+ % Eric A. Butcher\thanks{Professor, Aerospace and Mechanical Engineering Department, University of Arizona, AZ, USA}
+}%
+
+\markboth{IEEE TRANSACTIONS ON AUTOMATIC CONTROL,~Vol.~14, No.~8, August~2015}%
+{Shell \MakeLowercase{\textit{et al.}}: Bare Demo of IEEEtran.cls for IEEE Journals}
+
+\begin{document}
+
+
+
+\maketitle
+\thispagestyle{empty}
+\pagestyle{empty}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{abstract}
+	This paper is devoted to developing a new linear matrix inequality (LMI)-based technique for designing an optimal robust and time-varying controller for stabilizing linear time-invariant systems with delays and uncertainties. The new controller utilizes the current status and the memory of the system for stabilizing it. This technique is in contrast to the current LMI-based techniques wherein the controller is designed memoryless with a constant gain matrix. Attaining the proposed controller turns out to be a particular case of chance-constrained LMI problems. Consequently, two new scenario-based approaches are proposed to guarantee the asymptotic stability of the closed-loop system for most of the admissible uncertainties. In several illustrative examples, it is shown that the proposed technique can successfully stabilize time-delay systems more efficient than the current approaches.
+\end{abstract}
+
+\begin{IEEEkeywords}
+	time-delayed systems, periodic systems, state feedback control, optimal control, Chebyshev collocation method, Floquet theory.
+\end{IEEEkeywords}
+\IEEEpeerreviewmaketitle
+\section{Introduction}
+\IEEEPARstart{T}{ime delay} is ubiquitous in almost all physical processes with a multitude of practical applications, see~\cite{Gu2003stability,Richard2003time} and the reference therein. This phenomenon not only often complicates predicting the intuitive response of dynamical systems but it also can twist their stability drastically. Thus, it must be carefully considered in analyzing the stability. Delay differential equations govern these systems with aftereffect phenomena in their inner dynamics, so-called time-delay system. The characteristic equation of linear time-invariant (LTI) systems with delays is a transcendental function, namely characteristic exponential polynomial, with an infinite number of complex roots~\cite{Richard2003time,Gu2003stability}. The zero solution of a retarded time-delay LTI system, whose highest derivative term does not have a delay, is asymptotically stable if all roots of its characteristic exponential polynomial have negative real parts. The stability analysis of time-delay systems is more complicated than that of LTI systems, especially when they are associated with parameter uncertainties. There have been many techniques for analyzing the stability of time-delay systems with uncertainties such as H$_ \infty $ control methods~\cite{Ge1996robust}, linear matrix inequality (LMI) techniques~\cite{Li1997criteria,Yu1999technical}, Lyapunov-Krasovskii functionals~\cite{He2004parameter,Sun2009delay}, Riccati equation approaches~\cite{Shen1991memoryless}, and spectral methods~\cite{Dabiri2017FPTD,Butcher2004stability}.
+
+
+Since the characteristic equation of time-delay LTI systems has an infinite number of roots, one can see that they can be studied by using functional differential equations whose solution operator exists in a functional space. Although obtaining this solution operator is often impossible in an explicit form, it can be approximated and expanded by certain basis functions. Sufficient large number of basis functions assures the convergence of the approximated solution, as well as the stability of the functional differential equations. The same authors have recently proposed the Chebyshev polynomials to approximate the state transition operator of linear differential equations with nonlocal operators of time-delays, fractional operators, and periodic coefficients~\cite{Dabiri2017FPTD,Dabiri2016EfficientFCDMs,Dabiri2017MFDDEs,Dabiri2017RECCA}. Consequently, following our previous methods, a new scheme is proposed here to approximate the solution operator for time-delay LTI systems with uncertainties.
+
+
+In the last two decades, LMI techniques have been widely used to stabilize linear systems by converting them into convex optimization problems with possible LMI constraints~\cite{Boyd1994linear,Ben2002tractable, Skelton1997unified}. The main reasons for their success are obtaining bounds for the global optimum whose conservatism can be generally decreased by increasing the size of the optimization problem~\cite{Gahinet1996explicit, Skelton1997unified,Chesi2010lmi}. More recently, research in this area has concentrated on considering problems with uncertainties in system parameters, where a proper robust control design requires the satisfaction of the asymptotic stability for all possible values of uncertain parameters~\cite{Apkarian2000parameterized}. For instance, in~\cite{Li1997criteria}, an LMI approach is proposed for the robust stabilization of time-delay LTI systems by a linear state-feedback with a constant gain matrix. Although a robust convex program is tractable by the provided conditions in~\cite{Ben1998robust, El1998robust, Bertsimas2006tractable, Bertsimas2004price}, seeking guarantees against all possible values of uncertain parameters may introduce undesirable conservatism in the designing procedure. Nevertheless, presenting LMI constraints to a chance-constrained problem makes it even more difficult to solve~\cite{Vajda2014probabilistic}. Therefore, an alternative approach is to interpret robustness in a probabilistic sense wherein a low probability of constraint violations is allowed, instead of the immunization against all possible uncertainty outcomes. This technique introduces a particular variant of stochastic optimization called \textit{chance-constrained (probabilistic) optimization}.
+
+Typically, one of the burdens of the chance-constrained optimization problems is how difficult it is computationally due to their demand for the computation of multi-dimensional integrals associated with probabilities~\cite{Shapiro2009lectures,Boyd2004convex}. Indeed, the area has made substantial progress and different solutions and methods have been proposed to overcome this issue such as using big$- M $ constraints to obtain an equivalent large-scale mixed integer program~\cite{Tanner2010iis,Xu2015stochastic}, a set of $ p- $efficient points for a probability distribution~\cite{Dentcheva2000concavity,Prekopa1990dual}, a pattern-based modeling~\cite{Lejeune2012pattern,Lejeune2012pattern}, a mixed integer formulation with the random right-hand side~\cite{Luedtke2010integer,Kuccukyavuz2012mixing}, and Bernstein methods~\cite{Nemirovski2006convex}, \textit{scenario-based} approximations~\cite{Calafiore2005uncertain, Campi2008exact, Campi2011sampling}.
+
+
+Scenario-based approaches have the advantage of not requiring restrictive assumptions on the distribution of the random parameters. This feature increases their generality and flexibility, while the main concern is generating a conservative solution~\cite{Pagnoncelli2012risk,Embrechts2005quantitative}. For instance, for a portfolio selection problem, it has been shown that scenario-based methods are too conservative~\cite{Pagnoncelli2008computational}. Consequently, a constraint removal technique has been proposed to overcome this conservativeness~\cite{Campi2011sampling}, which lately are extended to two removal schemes named \textit{Greedy} and \textit{Randomized}~\cite{Pagnoncelli2012risk}. These removal schemes, however, are not efficient for solving semidefinite chance-constrained problems.
+
+
+In this paper, a new scheme is proposed to control design for time-delay LTI systems with uncertainties. For this purpose, a time-delay system is represented in a system of abstract ordinary differential equations by approximating the infinitesimal generator of the solution operator by the use of the Chebyshev differentiation matrix. It is shown that the feedback controller can be chosen with memory for time-delay LTI systems in contrast to the current LMI-techniques where the feedback controller is memoryless. The obtained control problem is a semidefinite chance-constraints optimization problem, and hence two efficient constraint removal schemes, the model-free, and the model-based approaches are proposed, to solve this semidefinite chance-constrained control problem. It is shown that the proposed removal schemes are more efficient than the existing methods. More importantly, it is shown that the proposed feedback control law with memory results in a better control performance in comparison to the current methods.
+%It is worth mentioning that although our numerical study is conducted on a semidefinite optimization problem in control theory, the methodology of constraint removal can be applied to solve a wide range of other practical chance-constrained problems.
+
+The rest of this paper is organized as follows. Section~\ref{sect:sect2} introduces the notation and some preliminaries. The problem statement is given in Section~\ref{sect:prob}. In Section~\ref{sect:apr}, the method of transferring a time-delay system to an infinite dimension of the LTI system is explained.
+Some of the existing chance-constraint optimization approaches are explained in Section~\ref{sect:sect3}. Our proposed methods for constraint removal and the idea behind them are explained in Section~\ref{sect:sect4}. Section~\ref{sect:sect6} presents a comprehensive numerical study on a semidefinite chance-constrained optimization problem. Finally, Section~\ref{sect:con} discusses possible future research and summarizes our contributions.
+
+\section{Preliminaries} \label{sect:sect2}
+In this section, a brief review of the relation between the problem of stabilizing uncertain LTI systems with a feedback control and the Lyapunov stability using LMI techniques is given.
+
+\subsection{Semigroup of Bounded Linear Operators}
+\begin{defn}
+	A function $ L(\mathbf x) : \mathbb R^m \mapsto \mathbb R^n $ is linear if (1) for any vectors $ \mathbf x $ and $ \mathbf y $ in $ \mathbb R^ m $, $ L(\mathbf x+ \mathbf y) = L( \mathbf x) +L( \mathbf y) $, and (2) for any vector $ \mathbf x $ in $ \mathbb R^ m $ and scalar $ \alpha $, we have $ L(\alpha\mathbf x) = \alpha L(\mathbf x) $.
+\end{defn}
+\begin{defn}
+	A function $ A(\mathbf x) : \mathbb R^m \mapsto \mathbb R^n $ is affine if there is a linear function $ L(\mathbf x) : \mathbb R^m \mapsto \mathbb R^n $ and a vector $ \mathbf b \in \mathbb R^n $ such that $ A(\mathbf x) = L(\mathbf x) + \mathbf b $.
+\end{defn}
+\begin{defn}
+	A Banach space $ \mathcal B $ is a vector space over the field $ \mathcal D $ that is associated with a norm $ \norm{\cdot}_{\mathcal B} $, and it is complete with respect to that norm. Thus, all Cauchy sequences are convergent in this space.
+\end{defn}
+\begin{defn}[{\cite[Definition 1.1]{Pazy2012semigroups}}]
+	A one-parameter family $ T(t) _{t\geq0} $ of bounded linear operators on a Banach Space $ \mathcal B $ is called a semigroup of bounded linear operators on $ \mathcal B $ if
+	\begin{itemize}
+		\item $T(0) =   I _{\mathcal B}$,
+		\item $T(t)T(s) = T(t+s), \quad  \forall t,s \geq 0 ,$
+	\end{itemize}
+	where $  I_{\mathcal B}$ is the identity on $ \mathcal B $.
+\end{defn}
+\begin{defn}[{\cite[Section 7.1]{Hale2013introduction}}]
+	A one-parameter family $ T(t) $ is a \textit{strongly continuous semigroup}, denoted by $ \mathcal C_0 $-semigroup, if for all $\chi \in \mathcal B $ we have $ \lim\limits_{h\searrow 0} \norm{T(h) \chi-\chi}_{\mathcal B}=0$, $ h>0 $, wherein $ x\searrow y $ means $ x $ approaches $ y $ from above (the right-hand derivative). In addition, if $ \norm{T(t)}_{\mathcal B} \leq 1 $, $ \forall t>0 $, then the family is call semigroup of \textit{contractions}.
+\end{defn}
+
+\begin{defn}[{\cite[Definition 3.2]{Breda2014stability}}]\label{defn:infi}
+	The \textit{infinitesimal generator} $ \A: \mathcal D (\A) \subseteq \mathcal B  \to \mathcal B $ of a $ \mathcal C_0 $-semigroup $ T(t) $ is defined by
+	\begin{equation}\label{key}
+		\A\chi\coloneqq \lim\limits_{h \searrow 0} \frac{T(h) -  I_{\mathcal B}}{h}\chi, \quad
+	\end{equation}
+	where
+	\begin{equation}\label{key}
+		\mathcal D (\A)=\parB{\chi \in \mathcal B \colon \lim\limits_{h \searrow 0} \frac{T(h) -  I_{\mathcal B}}{h}\chi \operatorname{ exists in } \mathcal B }.
+	\end{equation}
+\end{defn}
+\begin{thm}\label{thm:cauchyproblem}
+	Let $ \A $ be the infinitesimal generator of the $ \mathcal C_0 $-semigroup $ T(t)_{t\geq 0} $ in $ \mathcal B $, and  $ x(t)\in \mathcal D(\A) $  be continuously differentiable for any $ t\geq 0 $. Then, the unique solution of the abstract Cauchy problem
+	\begin{eqnarray}\label{eq:fdeA} \nonumber
+		\dot{x} (t)&=&\A {x} (t)
+	\end{eqnarray}
+	subject to $ \mathcal B- $valued initial function $  x(0)= \chi_0 \in \mathcal D(\A) $ is  $ x(t) = T(t) \chi_0$,  where $ \dot{ (\cdot)} $ represents the right-hand derivative.
+
+\end{thm}
+\begin{proof}
+	This can be simply proved by substituting $ T(t) \chi$ into the functional differential equation~(\ref{eq:fdeA}), using Definition~\ref{defn:infi}, and employing Corollary 1.4 in \cite{Pazy2012semigroups}.
+\end{proof}
+
+\begin{note}
+	If $ \mathcal B $ is finite-dimensional such as $ \mathcal C([a,b],\mathbb R^n) $, then $ \A=A $ is bounded and represented by a $ n \times n $ matrix. The solution operator is also obtained by the well-known exponential matrix $ T(t)=\exp(A t) $ whose infinitesimal generator is  $ A $. Moreover, the solution is given by $ x(t)= \exp(A t)  \chi$
+\end{note}
+\begin{defn}\label{def:nonlocalstate}
+	The functional state $ {\mathbf x}_t(\theta) $ (also called the time evolution of the history segments) belonging to the Banach space $ \mathcal B=\mathcal C([-\tau,0],\mathbb R^n) $ is defined as
+	\begin{equation}\label{eq:xt}
+		\mathbf x_t(\theta)\coloneqq \mathbf x(t+\theta), \quad \mathbf x\in[-\tau,0].
+	\end{equation}
+	where $ \mathbf x(t) \in \mathbb R^n $.
+\end{defn}
+
+
+\begin{defn}
+	Let $ \mathcal B=\mathcal C([-\tau,0],\mathbb R^n) $ with the sup-norm $ \norm{\cdot}_\infty $ including all continuous functions,  $ \mathcal L: \mathcal B \mapsto \mathbb R^n $ be  a continuous linear and bounded functional, and $\boldsymbol \phi (\theta)\in \mathcal B $. Then, the operator $ T(t):\mathcal B \mapsto \mathcal B $ is called the solution operator of the following functional differential equation (FDE)
+	\begin{eqnarray}\label{Eq:FDE} \nonumber
+		\dot{\mathbf x}(t)&=&\mathcal L\parp{ \mathbf x_t(\theta) },
+		\\
+		{\mathbf x}_0(\theta)& =&  \boldsymbol\phi(\theta), \quad \tau \leq \theta\leq 0,
+	\end{eqnarray}
+	such that $ \mathbf x_t (\theta)= T(t)\boldsymbol \phi(\theta) $, $ \tau \leq \theta \leq 0$.
+\end{defn}
+
+
+
+\begin{lem}[{\cite[Lemma 1.2 (Sec 7)]{Hale2013introduction}}]\label{lem:infinit}
+	The FDE~(\ref{Eq:FDE}) can be rewritten as an abstract Cauchy problem with the $ \mathcal C_0 $-semigroup $ T(t) _{\geq 0} $ of linear and bounded operators on $ \mathcal B $ whose infinitesimal generator $ \A $ is given by
+	\begin{flalign}\label{Eq:AODE}\nonumber
+		\boldsymbol \phi '(\theta) &= \A\boldsymbol \phi (\theta),
+		\\
+		\mathcal D(\A) &=\parB{\boldsymbol\phi(\theta)\in \mathcal B\colon{\boldsymbol\phi}'(\theta)\in \mathcal B,\;  \boldsymbol \phi'(0)=\mathcal L\parp{\boldsymbol\phi(\theta)}}.
+	\end{flalign}
+\end{lem}
+
+
+
+
+\begin{thm}[\cite{Gu2003stability}]
+	Consider the following nonlinear non-autonomous DDEs
+	\begin{equation}\label{eq:fdesk}
+		\dot {\mathbf x }(t)= \mathbf f (t,\mathbf x_t(\theta)),
+	\end{equation}
+	subject to initial condition $\mathbf x_0(\theta) = \Phi(\theta) $ with the trivial solution $ \mathbf x(t) = 0 $; where $ \mathbf f:\mathbb R_{\geq0} \times \mathcal B \mapsto\mathbb R^n $. Let $ u(t) $, $ v(t) $, and $ w(t) $, be positive continuous nondecreasing functions for all $ t\geq 0 $ and $u(0) = v(0) =0 $. In addition, the right-hand derivative of $ Vt,(\mathbf x_t(\theta)) $ is defined as
+	\begin{equation}\label{key}
+		\dot V(\mathbf x_t(\theta)) = \lim\limits_{h \to 0} \frac{ V(t+h,\mathbf x_{t+h}(\theta))- V(t,\mathbf x_t(\theta))}{h}.
+	\end{equation}
+	If there is continuous functional $ V(t,\mathbf x_t(\theta))\in \mathbb R_+ $ such that
+	\begin{subequations}
+		\begin{eqnarray}\label{key}
+			u(\norm{\mathbf x_0(0)}) &\leq& V(t,\mathbf x_t(\theta)) \leq v(\norm{\mathbf x_0(\theta)}),
+			\\
+			\dot V(t,\mathbf x_t(\theta))& \leq& -w(\norm{\mathbf x_0(0)}),
+		\end{eqnarray}
+	\end{subequations}
+	then the trivial solution, i.e. $ \mathbf x(t)=0 $, of functional differential equation in Eq.~(\ref{eq:fdesk}) is uniformly asymptotically stable.
+\end{thm}
+
+\begin{defn} [\cite{Li1997criteria}] \label{def:rs}
+	The uncertain time-delay LTI system~(\ref{Eq:DDE}) is \textit{robustly stable} if its uncontrolled zero solution is globally uniformly asymptotically stable for all admissible values of $ A(\boldsymbol{\delta}) $.
+\end{defn}
+
+\begin{defn}
+	The uncertain time-delay LTI system~(\ref{Eq:DDE}) is \textit{robustly stabilizable} if there exists $ \mathbf u(t) $ such that the resulting closed-loop system is robustly stable in the sense of Definition~\ref{def:rs}.
+\end{defn}
+
+
+\subsection{Convex optimization}
+\begin{defn}
+	A convex combination is a linear combination of vectors in a vector space where all coefficients are non-negative with the summation of one.
+\end{defn}
+\begin{defn}
+	A convex set is a subset of an affine space that is closed under convex combinations.
+\end{defn}
+\begin{defn}
+	Let define a function $ f(\mathbf x): X\mapsto {\mathbb{R}} $ where $ X $ is a convex set in a real vector space. Then, $ f(\mathbf x) $ is called convex in $ \mathbf x $ if and only if for all $ \mathbf x_{1} $ and $ \mathbf x_{2} \in X$ and $ \forall \alpha\in [0,1] $, we have
+	\begin{equation}\label{key}
+		f(\alpha\mathbf x_{1}+(1-\alpha)\mathbf x_{2})\leq \alpha f(\mathbf x_{1})+(1-\alpha)f(\mathbf x_{2}).
+	\end{equation}
+	In addition, the function $ f(\mathbf x) $ is strictly convex in $ \mathbf x $ if and only if the above inequality is strict when $ \mathbf x_1 \neq \mathbf x_2 $ and $ \forall \alpha\in (0,1) $.
+\end{defn}
+
+\subsection{Assumptions}
+The main optimization problems in this paper is associate with minimizing eigenvalues. In addition, the resulted semidefinite programming (SDP) problem can be solved by the robust linear program which is an important special case of convex optimization problems~\cite{Calafiore2006scenario, Ben2002tractable, El1998robust}. For this purpose, we will consider the following assumptions in the rest of the paper.
+\begin{ass}
+	Function $f(\boldsymbol\theta, \boldsymbol\delta): \Theta \times\Delta \mapsto \mathbb R $ is convex in $\boldsymbol\theta$ for any fixed value of $\boldsymbol\delta \in \Delta$ where $\Theta \subseteq \mathbb{R}^{l}$ is a closed convex set and $\Delta \subseteq \mathbb{R}^{r} $.
+	% $\in\mathcal {C}( \Theta \times\Delta,\mathbb R)$
+\end{ass}
+
+\begin{ass}
+	Let $ F_i(\mathbf \theta,\boldsymbol \delta) : \Theta \times\Delta \mapsto \mathbb R^n $, $ i=0,1,\ldots,m $, be symmetric matrices. Then, the function $f(\mathbf \theta ,\boldsymbol \delta)$ is defined affine in $\mathbf \theta $ as
+	\begin{equation}\label{key}
+		f(\mathbf \theta, \boldsymbol \delta)= \lambda_{\max} \parb{F_0(\boldsymbol \delta) + \sum_{i=1}^{m}\mathbf \theta_iF_i(\boldsymbol \delta)},
+	\end{equation}
+	where $\lambda_{\max}\parb{\cdot}$ denotes the largest eigenvalue.
+\end{ass}
+
+%The notation that is adopted throughout the paper is mostly standard and some of them are introduced as follows.
+%\begin{itemize}
+%	\item w.r.t., s.t.: with respect to, subject to;
+%	\item $X \succ 0$~(respectively, $X \succeq 0$): symmetric positive definite
+%	(respectively, semidefinite) matrix ;
+%	\item ;
+%	\item $conv\{x,y,\ldots\}$ : convex hull of vectors $x,y,\ldots$ .
+%\end{itemize}
+
+
+\section{Problem Statement} \label{sect:prob}
+
+
+Consider a retarded time-delay LTI system with a single delay and uncertainty described by
+\begin{equation}\label{Eq:DDE}
+	\dot {\mathbf x}(t)=A(\boldsymbol \delta) \mathbf x(t)+A_d(\boldsymbol \delta) \mathbf x(t-\tau)+ B(\boldsymbol \delta) \mathbf u(t),
+\end{equation}
+subject to an initial function $\boldsymbol{\phi} (t) =[\phi_1(t),\ldots,\phi_n(t)]^T$, $ \phi_i(t) \in \mathbb R$, $ t\in[-\tau,0] $, $ i=1,\ldots,n $, where $\mathbf x (t)\in \mathbb{R}^{n}$ is the state variable, $ A (\boldsymbol \delta) \in \mathbb R^{n \times n}$, $ A_d (\boldsymbol \delta) \in \mathbb R^{n \times n}$, and $ B (\boldsymbol \delta) \in \mathbb R^{n \times m} $ are generic functions of $\boldsymbol \delta \in \Delta$, $\Delta \subseteq \mathbb R ^ r$, $\mathbf u (t)\in \mathbb{R}^{m}$ is the control input, and $ \tau>0 $ is the delay.
+
+
+
+\begin{thm}[\cite{Calafiore2006scenario}]
+	The LTI system of the time-delay LTI system~(\ref{Eq:DDE}) is obtained when $ A_d (\boldsymbol \delta)=0 $. Let the state feedback control law $ \mathbf u(t)$ of the LTI version of system~(\ref{Eq:DDE}) be $ K\mathbf x(t) $ where $K \in \mathbb{R}^{n\times m}$ is the feedback gain matrix. Then, the closed-loop system is asymptotically stable at equilibrium point $ \mathbf x_e=0 $ if and only if $A_{cl}(\boldsymbol\delta)=A(\boldsymbol\delta)+ B(\boldsymbol \delta) K $ is a Hurwitz matrix for all the admissible $ \boldsymbol\delta \in \Delta $.
+\end{thm}
+
+\begin{thm}[\cite{Calafiore2006scenario, Apkarian2001continuous}]\label{thm:lti}
+	The closed-loop LTI version of system~(\ref{Eq:DDE}), i.e. $ A_d (\boldsymbol \delta)=0 $, is asymptotically stable at equilibrium point $ \mathbf x_e=0 $ if there exist a matrix $ V\in \mathbb{R}^{n\times n}$, a matrix $R \in \mathbb{R}^{m \times n}$, and a Lyapunov symmetric matrix $P \in \mathbb{R}^{n\times n} $ such that we have
+	\begin{eqnarray}\label{Matrx1}
+		\Pi(\boldsymbol\delta) \prec 0,
+	\end{eqnarray}
+	for all the admissible $ \boldsymbol\delta \in \Delta $; where $S \prec 0$ defines the symmetric negative property of $ S $ and
+	\begin{eqnarray}\label{eq:PI} \nonumber
+		\Pi(\boldsymbol\delta)&=&\begin{bmatrix}
+			-(V+V^T)                         & \varSigma_1(\boldsymbol\delta) & V^T \\
+			\varSigma_1^T(\boldsymbol\delta) & -P                             & 0   \\
+			V                                & 0                              & -P  \\
+		\end{bmatrix},
+		\\
+		\varSigma_1(\boldsymbol\delta)&=& V^TA^T(\boldsymbol\delta)+R^TB^T(\boldsymbol \delta) +P.
+	\end{eqnarray}
+	Consequently, if a feasible solution is found, the robustly stabilizing feedback gain matrix is recovered as $K=RV^{-1}$.
+\end{thm}
+%Therefore, a sufficient condition for robust stabilizability can be obtained by considering a specific parametrized matrix function family 
+
+The LMI problem~(\ref{Matrx1}) represents a convex LMI condition in $\boldsymbol\theta $ for any fixed $\boldsymbol\delta \in \Delta$. Thus, finding a feasible parameter $\boldsymbol\theta$ results in solving a robust convex program~\cite{Calafiore2006scenario}. That is
+\begin{eqnarray}\label{key}
+	&&\min \alpha \nonumber\\
+	&&\st : 	-I \preceq \Pi(\boldsymbol{\delta}) \preceq \alpha I ~, \quad \forall {\boldsymbol{\delta}}\in \Delta.
+\end{eqnarray}
+where s.t. denotes ``subject to''.
+
+
+
+In contrast to non-delay systems where the classic Lyapunov functions $ V(t,\mathbf x(t)) \in \mathbb R$ are used to study the behavior of $ \mathbf x(t) $, Lyapunov functionals $ V(t,\mathbf x_t(\theta) )$ are used to analyze the behavior of the continuous function $ \mathbf x_t(\theta) $ for time-delay systems where $ {\mathbf z}_t(\theta) $ is defined in Definition~\ref{def:nonlocalstate}. This method is called Lyapunov-Krasovskii method.
+
+
+For the uncontrolled time-delay system~(\ref{Eq:DDE}), i.e. $ \mathbf u(t)=0 $, one choice of the Lyapunov functional $ V(t,\mathbf x_t(\theta))\in \mathbb R_+$ is
+\begin{equation}\label{key}
+	V(t,\mathbf x_t(\theta))= \mathbf z^T_t(0) P \mathbf x_t(0) +\int_{-\tau}^{0} \mathbf z^T_t(\theta)S \mathbf x_t(\theta) d \theta,
+\end{equation}
+where $ P $ and $ S $ are $ n \times n $ positive definite matrices.
+Taking the right-hand derivative of $ V(t,\mathbf x_t(\theta)) $ and employing Lyapunov-Krasovskii theorem results in the following Riccati equation
+\begin{equation}\label{eq:ric}
+	A(\boldsymbol{\delta})^TP+PA(\boldsymbol{\delta})+PA_d(\boldsymbol{\delta})S^{-1}A_d^TP+S=-R,
+\end{equation}
+where $ R\succ 0$ is $ n \times n $ matrix. Equation~(\ref{eq:ric}) can be written as a LMI such that
+\begin{equation}\label{eq:lmi0}
+	\begin{bmatrix}
+		A(\boldsymbol{\delta})^TP+PA(\boldsymbol{\delta})+S & PA_d(\boldsymbol{\delta}) \\
+		PA_d(\boldsymbol{\delta})                           & -S
+	\end{bmatrix} \prec 0.
+\end{equation}
+The sufficient condition of uniformly asymptotic stability of the time-delay system~(\ref{Eq:DDE}) is obtained by the feasibility of the LMI~(\ref{eq:lmi0}).
+
+
+
+It has been proved that LMI techniques can be used to stabilize the uncertain time-delay LTI system~(\ref{Eq:DDE}) with norm-bounded time-varying parametric uncertainty by the use of memoryless state feedback controller
+\begin{equation}\label{eq:kx}
+	\mathbf u(t) = K\mathbf x(t) ,
+\end{equation}
+where $ K\in \mathbb R^{m \times n} $~\cite{Yu1999lmi}.
+
+From an implementation standpoint, although $ \mathbf x_t(\theta) $ of the time-delay LTI system~(\ref{Eq:DDE}) is available at any time $ t $, only an small portion of that at $ \theta=0 $ is used of all the current proposed feedback control law in LMI techniques, i.e. see Eq.~(\ref{eq:kx}). Hence, one can consider entire states in $ \theta \in [t-\tau,t] $ to define a new control law. To our best knowledge, there is no study to address this issue, and hence we introduce the following linear feedback control law for the time-delay LTI system~(\ref{Eq:DDE}) for the first time.
+
+This paper is devoted in developing a new technique to obtain an optimal robust feedback controller with memory for the uncertain time-delay system~(\ref{Eq:DDE}). The memory of a process can be expressed by choosing a proper kernel for the Volterra integral. In other words, the control law with memory can be chosen as
+\begin{equation}\label{Eq:feedbackcntrlmemory}
+	\mathbf u(t) = \int_{t-\tau}^{t}  \kappa(\theta-t) \mathbf x(\theta) d \theta,
+\end{equation}
+where $  \kappa(\theta): [-\tau,0] \mapsto \mathbb R ^{m\times m} $ is a measurable piecewise smooth function and it weightening the states to determine  the memory property of the control input. The proposed control law seems more realistic as the nonlocal feature of functional differential equations implies the control feedback of the time-delay LTI system~(\ref{Eq:DDE}) can be chosen nonlocal as well.
+
+\section{Abstract Cauchy Representation} \label{sect:apr}
+In this section, the Cauchy abstract representation of the time-delay system~(\ref{Eq:DDE}) is obtained. Then, the Chebyshev differentiation matrix is used to approximate the infinitesimal generator of the solution operator of the analogous functional differential equations. The main idea is to define the true solution $ \mathbf x_t(\theta) $ in a Banach space $ \mathcal B= \mathcal C([-\tau,0], \mathbb R^n) $ associated with the norm $ \norm{\mathbf x}=\operatorname{sup}\limits_{-\tau \leq \theta \leq 0} \norm {\mathbf x(\theta)} $, and study the geometrical behavior of the solution in the new space.
+
+
+%\begin{thm}
+%    Let $ \mathcal B=\mathcal C([-\tau,0],\mathbb R^n) $ with the sup-norm $ \norm{\cdot}_\infty $ including all continuous functions,  $ \mathcal L: \mathcal B \mapsto \mathbb R^n $ be  a continuous linear and bounded functional, and $ F: \mathbb R^n \mapsto  \mathbb R^n  $ be a continuous linear and bounded operator, and $\boldsymbol \phi (\theta)\in \mathcal B $. Then, the $ \mathcal C_0 $-semigroup  $ T(t)_{\geq 0} :\mathcal B \mapsto \mathcal B $ is the solution operator of the following functional differential equation
+%    \begin{eqnarray}\label{Eq:FDE} \nonumber
+%    \dot{\mathbf x}(t)&=& F\parp{ \mathbf x(t) }+\mathcal L\parp{ \mathbf x_t(\theta) },
+%    \\
+%    {\mathbf x}_0(\theta)& =&  \boldsymbol\phi(\theta), \quad \tau \leq \theta\leq 0,
+%    \end{eqnarray}
+%    whose 
+%    
+%    
+%\end{thm}
+%
+%
+%
+%\begin{lem}[{\cite[Lemma 1.2 (Sec 7)]{Hale2013introduction}}]
+%    The FDE~(\ref{Eq:FDE}) can be rewritten as a Cauchy problem with the $ \mathcal C_0 $-semigroup $ T(t) _{\geq 0} $ of linear and bounded operators on $ \mathcal B $ whose infinitesimal generator $ \A $ is given by
+%    \begin{flalign}\label{Eq:AODE}\nonumber
+%    \boldsymbol \phi '(\theta) &= \A\boldsymbol \phi (\theta), 
+%    \\
+%    \mathcal D(\A) &=\parB{\boldsymbol\phi(\theta)\in \mathcal B\colon{\boldsymbol\phi}'(\theta)\in \mathcal B,\;  \boldsymbol \phi'(0)=\mathcal L\parp{\boldsymbol\phi(\theta)}}.
+%    \end{flalign}
+%\end{lem}
+
+\begin{thm}\label{thm:ADDE}
+	The time-delay system~(\ref{Eq:DDE}) without uncertainties can be written as an abstract Cauchy problem with the $ \mathcal C_0 $-semigroup $ T(t) _{\geq 0} $ of linear and bounded operators on $ \mathcal B =\mathcal C([-\tau,0],\mathbb R^n)$ whose infinitesimal generator is
+	\begin{flalign}\label{Eq:ADDE0}\nonumber
+		\boldsymbol \phi '(\theta) &= \A\boldsymbol \phi (\theta),
+		\\ \nonumber
+		\mathcal D(\A) &=
+		\left\{
+		\boldsymbol\phi(\theta)\in \mathcal B\colon{\boldsymbol\phi}'(\theta)\in \mathcal B,
+		\boldsymbol \phi'(0)=A \boldsymbol \phi(0)+
+		\right.
+		\\
+		&
+		\left.
+		A_d \boldsymbol \phi(-\tau)+B \int_{-\tau}^{0}  \kappa(\theta) \boldsymbol \phi(\theta) d \theta
+		\right\}
+		.
+	\end{flalign}
+\end{thm}
+\begin{proof}
+	According to Definition~\ref{def:nonlocalstate}, $ \mathbf x(t)=\mathbf x_t(0) $ when $-\tau \leq  t \leq 0$  as well as  the feedback control~(\ref{Eq:feedbackcntrlmemory}) can be rewritten as
+	\begin{equation}\label{eq:cntrllawmemo}
+		\mathbf u(t) = \int_{-\tau}^{0}  \kappa(\theta) \mathbf x_t(\theta) d \theta.
+	\end{equation}
+	Thus, the linear functional operator can be defined as
+	\begin{equation}\label{eq:LDDEs}
+		\mathcal L( \mathbf x_t(\theta)):=A \mathbf x_t(0)+A_d \mathbf x_t(-\tau)+B \int_{-\tau}^{0}  \kappa(\theta) \mathbf x_t(\theta) d \theta.
+	\end{equation}
+	Now, according to Lemma~\ref{lem:infinit} the infinitesimal generator for the $ \mathcal C_0- $semigroup solution operator of the abstract Cauchy problem with the above linear functional operator is given by Eq.~(\ref{Eq:ADDE}). This completes the proof of Theorem~\ref{thm:ADDE}.
+\end{proof}
+\begin{cor}\label{prop:ADDE}
+	Uncertainties in time-delay system~(\ref{Eq:DDE}) can be directly included in the linear functional operator~(\ref{eq:LDDEs}). Hence, the  infinitesimal generator is
+	\begin{flalign}\label{Eq:ADDE}\nonumber
+		\boldsymbol \phi '(\theta) &= \A(\boldsymbol \delta)\boldsymbol \phi (\theta),
+		\\ \nonumber
+		\mathcal D(\A(\boldsymbol \delta)) &=
+		\left\{
+		\boldsymbol\phi(\theta)\in \mathcal B(\boldsymbol \delta)\colon{\boldsymbol\phi}'(\theta)\in \mathcal B,
+		\boldsymbol \phi'(0)=A (\boldsymbol \delta)\boldsymbol \phi(0)+
+		\right.
+		\\
+		&
+		\left.
+		A_d (\boldsymbol \delta)\boldsymbol \phi(-\tau)+B (\boldsymbol \delta)\int_{-\tau}^{0}  \kappa(\theta) \boldsymbol \phi(\theta) d \theta
+		\right\}
+		.
+	\end{flalign}
+\end{cor}
+\begin{proof}
+	This proof relies on the time invariant property of uncertainties and can be completed similar to the proof of Theorem~\ref{thm-1}.
+\end{proof}
+
+Although Theorem~\ref{thm:ADDE} defines the infinitesimal generator $ \A $ in the Banach space, it is usually difficult, if not impossible, to find a close form for it due to its unbounded property. Thus, one way is to follow Yosida's idea and approximate the unbounded $ \A $ by a Cauchy sequence of bounded operators $ A_N $, $ N\in \mathbb N $, such that $\A=\lim\limits_{N\to \infty}   A_N$ (see Section 3 in \cite{Engel1999one}). One can see that $  \mathcal A \equiv (\cdot)'  $ with some modifications established in Eq.~(\ref{Eq:ADDE}). Consequently, $ (\cdot)' $ can be approximated with a bounded operational matrix of differentiation $ \operatorname{D}_{N} $, $ N \in \mathbb N $, that maps the discretized function $ \mathbf x_\disc =[x(t_0),x(t_1),\ldots,x(t_{N-1})]^T$ at some finite collocation points $ \mathbf t_\disc=[t_0=-\tau,t_1,\ldots,t_{N-2},t_{N-1}=0] $ onto the discretized value of $ x'(t) $ at those points. That is
+\begin{eqnarray}\label{Eq:FCDM}
+	{\operatorname{D}_{N}} {\mathbf{x}_\disc} = \left[
+		x'(t_0=-\tau) ,
+		x'(t_1),
+		\ldots,
+		% \right.
+		%\\
+		%\left.
+		%x'(t_{N-2}) ,
+		x'(t_{N-1}=0)
+		\right]^T.
+\end{eqnarray}
+
+An important advantage of this approach is that the approximated solution can be obtained in matrix forms. Additionally, sophisticated interpolation techniques can be used to construct this bounded differentiation matrix. For instance, one can use a polynomial of $ N $th degree on $ N+1 $ equispaced points with the step size $ h $ which results in a linear convergence of $ O(h^m) $~\cite{Trefethen2000spectral}. This type of interpolation techniques results in finite-difference approximations which can be simply handled and implemented. However, the approximation error is bounded by the $ N $th-order derivative of the function which usually causes Runge's phenomenon~\cite{Trefethen2000spectral} and, more importantly, they result in obtaining differentiation matrix whose bandwidth is crucially small~\cite{Dabiri2016EfficientFCDMs}. As a matter of fact, this bandwidth limitation results in not capturing all the stability properties of the original FDE solution~\cite{Dabiri2017RECCA}. Spectral methods with exponential convergence, one the other hand, removes the restriction of using equispaced points and utilize non-equispaced ones to construct a differentiation matrix with a significantly larger bandwidth, which typically equals to the number of collocation points~\cite{Dabiri2016EfficientFCDMs}.
+
+The most commonly used orthogonal polynomials for interpolation are the Chebyshev polynomials defined in $ [-1,1] $, which are also used in this study. Their exterma points known as the Chebyshev-Gauss-Lobatto (CGL) points have been extensively used in spectral methods. The CGL points are given by
+\begin{equation}\label{eq:CGL}
+	t_j = \cos(j\frac{\pi}{N-1}), \quad j = 0,1,\ldots,N-1 ,
+\end{equation}
+in $ \left[-1,1\right] $.
+
+The CGL collocation points are more condensed at the edges of the interval as shown in Fig.~\ref{label}. In addition, the CGL points can be mapped to any arbitrary interval $ [a,b] $ by using the simple transformation $ t^*= \frac{b-a}{-2} (t-1)+a$. The shifted-Chebyshev polynomials of the first kind $ T^*_N(t) $ are the result of this transformation.
+
+To construct such a differentiation matrix with a large bandwidth for the interval of $ [a,b] $, consider an approximation of a smooth function $ x(t) $ at the shifted-CGL points by the use of the shifted-Chebyshev polynomials of the first kind. The shifted-Chebyshev polynomials of the first kind are defined by the following recurrence relation ($ n=2,3,\ldots $):
+\begin{equation}\label{eq:reccheb}
+	T^*_n(t)=2\parp{		\mu(t-a) +1}T^*_{n-1}(t)-T^*_{n-2}(t),
+\end{equation}
+where $ \mu=\frac{-2}{b-a} $, $ T^*_0(t)=1 $, and $ T^*_1(t)=		\mu(t-a) +1$. Accordingly, the collocation points $ \mathbf t_\disc $ are given by the shifted-CGL points
+\begin{equation}\label{key}
+	{{t}_{k}}=\frac{1}{		\mu}\parp{\cos \left( \frac{k\pi }{N-1} \right)-1} +a,
+\end{equation}
+where $  k=0,1,\ldots,N-1 $.
+
+
+An extension of $ x(t) $ by using the shifted-Chebyshev polynomials at the discretized points  $ \mathbf{t}_\disc $ is
+\begin{equation}\label{eq:chebapprox}
+	x(t)\approx \mathcal P_{N-1}(x(t))=\sum\limits_{k = 0}^{N-1} {{{\hat x}_k}{T^*_k}(t)},
+\end{equation}
+where $ {{\hat{x}}_{k}} $ can be obtained by the discrete-orthogonality relationship for the shifted-Chebyshev polynomials. That is
+\begin{equation}\label{eq:cheborth}
+	\sum\limits_{k = 0}^{N-1}  \frac{1}{c_k}{{T^*_i}({t_k}){T^*_j}({t_k})} = 	\mu{c_{i}}{\mkern 1mu} {\delta _{ij}},
+\end{equation}
+where
+\begin{equation*}\label{key}
+	{c_{ij}} =
+	\begin{cases}
+		N-1     & i = 0  \operatorname { or } N-1, \\
+		(N-1)/2 & \operatorname{otherwise},
+	\end{cases}
+\end{equation*}
+and $ \delta_{ij} $ is the Kronecker delta. Introducing the orthogonal relationship~(\ref{eq:cheborth}) into Eq.~(\ref{eq:chebapprox}), one obtains
+\begin{equation}\label{eq:coefcheb}
+	{\hat x_k} = \frac{1}{\mu} \frac{2}{{(N-1){c_k}}}\sum\limits_{i = 0}^{N-1} {\frac{1}{c_i}{T_k(t_i)}x(t_i)}
+\end{equation}
+for $  k = 0,1, \ldots ,N-1$.
+
+In addition, Eqs.~(\ref{eq:chebapprox}) to (\ref{eq:coefcheb}) can be written in the following matrix form
+\begin{equation}\label{eq:chebapproxmatrixform}
+	x(t)\approx \mathbf T^*(t) H {\mathbf{x}}_{\disc},
+\end{equation}
+where  $ \mathbf T^* (t)= 	[T^*_0(t),T^*_1(t),\ldots,T^*_{N-1}(t)]$, $ \mathbf x_\disc $ is the discretized values of $ x(t) $ at the shifted-CGL points, and $ H $ is an $ N \times N $ constant matrix defined as
+\begin{flalign}\label{key}\nonumber
+	&H= \frac{1}{\mu (N-1)}
+	\\
+	&{\begin{bmatrix}
+				{\frac{1}{2}}                                  & 1                                    & \ldots & 1                                          & {\frac{1}{2}} \\
+				{{{\left( { - 1} \right)}^1}}                  & {2{T_1}\left( {{t_1}} \right)}       & \ldots & {2{T_1}\left( {{t_{N - 2}}} \right)}       & 1             \\
+				\vdots                                         & \vdots                               & \ddots & \vdots                                     & \vdots        \\
+				{{{\left( { - 1} \right)}^{N - 2}}}            & {2{T_{N - 2}}\left( {{t_1}} \right)} & \ldots & {2{T_{N - 2}}\left( {{t_{N - 2}}} \right)} & 1             \\
+				{\frac{1}{2}{{\left( { - 1} \right)}^{N - 1}}} & {{T_{N-1}}\left( {{t_1}} \right)}    & \ldots & {{T_{N-1}}\left( {{t_{N - 2}}} \right)}    & {\frac{1}{2}}
+			\end{bmatrix}}.
+\end{flalign}
+
+\begin{lem}
+	The differentiation matrix $\operatorname{D}_{N}  $ giving an approximation for the right-hand derivative $ (\cdot)' $ at $ N $ CGL points is defined by
+	\begin{equation}\label{key}
+		\operatorname{D}_{N} =
+		\begin{bmatrix}
+			{T_0^*}'(t_0)      & {T_1^*}'(t_0)     & \ldots & {T_{N-1}^*}'(t_0)     \\
+			{T_0^*}'(t_1)      & {T_1^*}'(t_1)     & \ldots & {T_{N-1}^*}'(t_1)     \\
+			\vdots             & \vdots            & \ldots & \vdots                \\
+			{ T_0^*}'(t_{N-1}) & {T_1^*}'(t_{N-1}) & \ldots & {T_{N-1}^*}'(t_{N-1}) \\
+		\end{bmatrix}H.
+	\end{equation}
+\end{lem}
+\begin{proof}
+	The right-hand derivative $ (\cdot)' $ is a linear operator,  and hence applying that on the both side of  Eq.~(\ref{eq:chebapproxmatrixform}) results in
+	\begin{equation}\label{Eq:chebDif}
+		x'(t)\approx {\mathbf T^*}'(t)H {\mathbf{x}}_{\disc} .
+	\end{equation}
+	Substituting the collocation points one by one into Eq.~(\ref{Eq:chebDif}) completes the proof.
+\end{proof}
+
+\begin{cor}[\cite{Trefethen2000spectral}]\label{note:D}
+	Equation~(\ref{Eq:chebDif}) can be computed analytically by using the cardinal functions such that the entries of $ \operatorname{D}_{N} $ are given by
+	\begin{equation}\label{Eq:FCFM}
+		[\operatorname{D}_{N}]_{ij}=
+		\frac{1}{\mu } \begin{cases}
+			-\nicefrac{2(N-1)^2+1}{6},              & i=j=0,
+			\\
+			\nicefrac{-x_i}{2(1-x_i^2)},            & 1 \leq i<N-1,
+			\\
+			\nicefrac{c_i(-1)^{i+j}}{c_j(x_i-x_j)}, & i \neq j,
+			\\
+			\nicefrac{2(N-1)^2+1}{6},               & i=j=N-1,
+		\end{cases}
+	\end{equation}
+	where $ c_j=1 $ for $ 1 \leq j <N-1 $ and $ c_0=c_{N-1}=2 $.
+
+\end{cor}
+
+
+\begin{lem}
+	Consider the following summation of the two functions at the CGL collocation points in Eq.~(\ref{eq:CGL})
+	\begin{equation}\label{eq:sum}
+		J_N=\sum_{i=0}^{N-1} \tilde f_i g_i,
+	\end{equation}
+	where $ \tilde f_i $ and $ g_i $ are the discretized values of $ \tilde f(t) $ and $ g(t) $ at the CGL collocation points, respectively.
+	Equation~(\ref{eq:sum}) is an approximation for the following integral
+	\begin{equation}\label{key}
+		J_N \approx\int _{-1}^{1}f(t)g(t)\,dt,
+	\end{equation}
+	where $ f(t)=\frac{N-1}{\pi}\frac{\tilde f(t)}{\sqrt{1-t^2}} $.
+
+\end{lem}
+
+
+\begin{proof}
+	Let rewrite Eq.~(\ref{eq:sum})  as
+	\begin{equation}\label{eq:JN}
+		J_N={\sum_{i=0}^{N-1}}'' w_i \parp{\frac{\tilde f_i}{w_i} g_i}.
+	\end{equation}
+	where double prime shows the first and terms of the summation are halved, and the weights $ w_i $, $i=0,1,\ldots,N-1  $, are the Chebyshev-Gauss quadrature weights given by
+	\begin{equation}\label{eq:weights}
+		w_{i}={\frac {\pi }{N-1}}\sin ^{2}\left({\frac {i}{N-1}}\pi \right), \quad i=0,1,\ldots,N-1.
+	\end{equation}
+
+	Let $ w(t)={\frac {\pi }{N-1}} \parp {1-t^{2}}$. The discretized values of $ w(t) $ at the CGL points~(\ref{eq:CGL}) are given by Eq.~(\ref{eq:weights}), which can be simply proven by using the  trigonometric identities and noting $ j\frac{\pi}{N-1}= \cos^{-1}(t_j ) $. Then, according to the Chebyshev-Gauss-quadrature method, one obtain
+	\begin{equation}\label{key}
+		J_N\approx \int _{-1}^{1}\parp{\frac{N-1}{\pi}\frac{\tilde f(t)}{\sqrt{1-t^2}} }g(t)\,dt ,
+	\end{equation}
+	Setting $ f(t)=\frac{N-1}{\pi}\frac{\tilde f(t)}{\sqrt{1-t^2}} $ completes the proof.
+
+\end{proof}
+
+\begin{thm}\label{thm:DDE}
+	The retarded time-delay LTI system~(\ref{Eq:DDE}) can be approximated by the following abstract LTI system
+	\begin{eqnarray}\label{eq:DDEAbs}
+		\dot{\mathbf x}_\disc(t)
+		=
+		A_\disc(\boldsymbol{\delta})
+		{\mathbf x}_\disc(t)+ B_\disc(\boldsymbol{\delta})  \mathbf u^*_\disc(t),
+	\end{eqnarray}
+	where $ \mathbf x_\disc(t) \in \mathbb R^{nN} $, $ A_\disc(\boldsymbol{\delta})  \in \mathbb R^{nN\times nN} $ is defined by
+	\begin{equation}\label{Eq:Ad}
+		A_\disc(\boldsymbol{\delta})  =\bar I_{Nn}^{(n)}({\operatorname{D}_{N}} \otimes I_n)+F_\disc(\boldsymbol{\delta}),
+	\end{equation}
+	where $ {I}_{N} $ is the $ N\times N $ identity matrix, $  {\bar I}_{N}^{(n)}$ is a modified $ N\times N $ identity matrix whose $ n- $first rows are replaced by zeros,  $ \operatorname{D}_{N} $ is the differentiation matrix  at the shifted-CGL points in $ [0,-\tau] $ defined in Corollary~\ref{note:D}, the discretized matrix $ F_\disc(\boldsymbol{\delta})  $ is defined by
+	\begin{equation}\label{key}
+		F_\disc(\boldsymbol{\delta}) =\left[
+			\begin{array}{c}
+				\begin{array}{c;{4pt/2pt}c;{4pt/2pt}c}
+					\mbox{ $A(\boldsymbol{\delta}) $} & \mbox{ $\mathbf 0_{n\times n(N-2)}$} & \mbox{ $A_d(\boldsymbol{\delta}) $}
+				\end{array}
+				\\ \hdashline[4pt/2pt]
+				\mbox{ $\mathbf 0_{n(N-1)\times nN}$}
+			\end{array}
+			\right],
+	\end{equation}
+	the discretized matrix $ B _\disc(\boldsymbol{\delta}) $ is
+	\begin{equation}\label{key}
+		B_\disc(\boldsymbol{\delta}) =\left[
+			\begin{array}{c;{2pt/2pt}c}
+				B^T(\boldsymbol{\delta}) & \mathbf  0_{m\times n(N-1)}
+			\end{array}
+			\right]^T,
+	\end{equation}
+	and the feedback control is
+	\begin{equation}\label{key}
+		\mathbf u^*_\disc(t)=  K^*_\disc {\mathbf x}_\disc(t),
+	\end{equation}
+	in which the discretized $ K^*_\disc $ is a $ m\times nN $ matrix of the control gain matrix $ K^*(t) $  such that
+	\begin{equation}\label{key}
+		\kappa(-\tau-\theta)=\frac{N}{\pi} K^*(\theta), \quad -\tau \leq \theta \leq 0.
+	\end{equation}
+
+\end{thm}
+
+\begin{proof}
+	The infinitesimal generator~(\ref{Eq:ADDE}) can be approximated and bounded by using the differentiation matrix~(\ref{Eq:FCFM}) at the shifted-CGL points in $ [0,-\tau] $ as Eq.~(\ref{Eq:Ad}). However, from an implementation standpoint, we would like to preserve the evolution of the bounded infinitesimal generator~(\ref{Eq:Ad}) over time with an unbounded linear operator such as $ \frac{d}{dt} $. For this purpose, let $  x_{i,\theta}(t) = x_i(t+\theta)$, $ -\tau \leq \theta \leq 0$, and $ t\geq 0 $; the discretization of $  x_{i,\theta} (t) $ and $ \mathbf x_{\theta}(t) $ at the collocation points $ \mathbf \theta_\disc=[\theta_0=0,\theta_1,\ldots,\theta_{N-2},\theta_{N-1}=-\tau] $ denote by $ \mathbf x_{i,\disc}(t) $ and $ \mathbf x_{\disc}(t) =[\mathbf x_{1,\disc}^T(t) , \ldots, \mathbf x_{n,\disc}^T (t) ]^T$, respectively.
+
+
+	One can see $ \mathbf u_{i,\disc}(t)=\sum_{j=0}^{N-1} [K^*_\disc]_{i,i+jn}\mathbf x_{i+jn,\disc}(t)$ for $ i=1,2,\ldots,n $.
+
+	If simple to show that if $ K^*_\disc $ be the discretized form of $ K^*(t) $, then
+
+	One can obtain the the discretized $ K^*_\disc $ are in the form of
+	Now let the integral~(\ref{eq:cntrllawmemo}) be approximated as the shifted-CGL
+
+
+	Thus, by using the continuity of solution and Corollary~\ref{prop:ADDE}, one obtain the abstract LTI system~(\ref{eq:DDEAbs}) in an approximation for the retarded time-delay LTI system~(\ref{Eq:DDE}) at the $ N $ collocation points.
+\end{proof}
+
+As a result, the abstract LTI system~(\ref{eq:DDEAbs}) can be solved by all the available chance-constraint optimization techniques for uncertain LTI systems according to Theorem~\ref{thm:lti}, which will be detailed in the following section.
+
+\section{Previously Optimization Approaches} \label{sect:sect3}
+In this section, we introduce the general form of chance-constrained programs and some of the existing methods for solving the chance-constraint semidefinite optimization problems.
+\subsection{Chance Constrained Semidefinite Programs}
+The corresponding chance-constrained problem for the model that we introduced in the previous section (see the LTI system~(\ref{eq:DDEAbs})) can be written in the following form
+\begin{flalign}\label{Eq:CCP}
+	&\min, \alpha \quad \st : \nonumber\\
+	&\mathbb{P}\{-I \preceq \Pi(\boldsymbol{\delta})\preceq \alpha I\} \geq 1- \epsilon,
+\end{flalign}
+where $1-\epsilon \in [0,1]$ is the reliability level~\cite{Pagnoncelli2012risk}.
+Aside from special cases, chance-constrained problems cannot be converted into tractable deterministic optimization problems. Hence, for solving these problems, we need to rely on approximations. In what follows, we present several popular approximation approaches to solve chance-constrained problems.
+\subsection{The Scenario Approach}
+The idea behind the scenario approach is very intuitive and straightforward.
+In the standard scenario approach~\cite{Calafiore2006scenario}, we substitutes the chance-constraint program in (\ref{Eq:CCP}) with a finite number of constraints, each corresponding to a different realization $\boldsymbol\delta^{i}, i = 1,.. ., N$ of the uncertain parameter $\boldsymbol\delta$.\\
+Assuming $\boldsymbol\delta^1, \ldots, \boldsymbol\delta^N$ be independent and identically distributed samples of size $N$, extracted according to probability $\mathbb{P}$, the \textit{scenario program} associated with chance constrained program~(\ref{Eq:CCP}) is defined as
+\begin{flalign}\label{Eq:SA}
+	&\min~ \alpha, \nonumber\\& \st : 	-I \preceq \Pi(\boldsymbol{\delta}^i) \preceq \alpha I, \quad \forall ~ i=1, \ldots, N.
+\end{flalign}
+\subsection{The Scenario Approach with Constraint Removal}
+Since the \textit{Scenario Approach} provides a conservative solution for the chance-constrained problem~(\ref{Eq:CCP}) by enforcing all the total $ N $ constraints, a good approximation for its solution cannot be expected~\cite{Pagnoncelli2008computational}.
+On the other hand, the general framework introduced by Campi and Garatti in~\cite{Campi2011sampling} can be employed to obtain a less conservative solution by relaxing problem (\ref{Eq:SA}). In this approach, $k$ constraints are removed out of the total $N$ scenario constraints in Eq.~(\ref{Eq:SA}), and the feasibility of the problem~(\ref{Eq:CCP}) is retained with the confidence $1-\beta$ when the following inequality is satisfied:
+\begin{eqnarray}\label{Eq:Dropk}
+	\binom{k+d-1}{k} \sum_{j=0}^{k+d-1} \binom{N}{j} \epsilon^j (1-\epsilon)^{N-j} \leq \beta ,
+\end{eqnarray}
+where $ d $ is the number of optimization variables.
+
+The largest $k$ that satisfies the inequality~(\ref{Eq:Dropk}) is chosen to obtain the least conservative solution possible for the given $N$, $\epsilon$, $d$, and $ \beta $. Although the results of (\ref{Eq:Dropk}) holds true independent from the procedure of removing $k$ constraints, the removed constraints impact on the value of the objective function~(\ref{Eq:SA}). Therefore, one optimal way of removing constraints is to discard those that lead to the largest possible improvement of the objective function. This approach can be implemented by the following mixed-integer semidefinite programming (MISDP) problem~\cite{Pagnoncelli2008computational,Luedtke2008sample}:
+\begin{flalign}\label{Eq:integer}
+	\min \alpha, \nonumber\\
+	\st:&\Pi(\boldsymbol{\delta}^i)+M_1z_iI \succeq -I,\quad \forall ~ i=1, \ldots, N\nonumber\\
+	&\Pi(\boldsymbol{\delta}^i)-M_2z_iI \preceq \alpha I,\quad \forall ~ i=1, \ldots, N\nonumber\\
+	&\sum_{i=1}^{N}z_i \leq k,\nonumber\\
+	&z_i \in \{0,1\}^N \quad \forall ~ i=1, \ldots, N,
+\end{flalign}
+where $M_1$ and $M_2$ are two large enough constants such that the corresponding constraint becomes redundant if $z_i=1$. The burden of the program~(\ref{Eq:integer}) is that it introduces a binary variable per each of the $N$ scenarios that can be computationally challenging.
+
+\subsection{Greedy Constraint Removal Procedure}
+A greedy constraint removal method has been introduced to obtain a feasible solutions to the problem by removing $k$ constraints iteratively, which is detailed as follows~\cite{Pagnoncelli2012risk}. First,  an initial problem~(\ref{Eq:SA}) with $N-i+1$ constraints is solved to determine a set $n_i$ active constraints at each iteration $i$. Next, the active constraints are removed one at a time at each iteration, and the corresponding $n_i$ additional programs of form~(\ref{Eq:SA}) (i.e., each with $N-i$ constraints) are solved. Finally, the active constraint whose elimination yields the greatest improvement in the objective value at each iteration are identified and removed. As a result, the greedy removal algorithm demands of solving $1+ \sum_{i=1}^{k} n_i$ problems in the form~(\ref{Eq:SA}).
+
+
+\section{Constraint Removal Approaches} \label{sect:sect4}
+In this section, two constraint removal schemes, called one model-free and the other model-based, are introduced. A theoretical result is presented prior to presenting the two schemes.
+\begin{thm}\label{lem-1}
+	If $g(\x,\boldsymbol{\delta})$ is convex in $\boldsymbol{\delta}$ for any ${\x}\in X$, then the following two optimization problems are equivalent:
+	\begin{flalign}\label{EQ-1}
+		\min f(\x), \nonumber\\
+		\st: & g({\x},\boldsymbol{\delta}^i)\leq 0, \quad \quad\quad \forall ~ i=1, \ldots, N,\nonumber\\
+		&{\x}\in X.
+	\end{flalign}
+	\begin{flalign}\label{EQ-2}
+		\min f(\x), \nonumber\\
+		\st:& g({\x},\boldsymbol{\delta})\leq 0, \forall \boldsymbol\delta\in \operatorname{Conv}(\boldsymbol{\delta}^1,\ldots,\boldsymbol{\delta}^N),\nonumber\\
+		& {\x}\in X,
+	\end{flalign}
+	where $\operatorname{Conv}\{\mathbf p_1,\mathbf p_2,\ldots,\mathbf p_n\}$ denotes the convex hull of the points  $\mathbf p_1,\mathbf p_2,\ldots,\mathbf p_n$ (or the smallest convex set containing those points).
+\end{thm}
+\begin{proof}
+	Let $\x_1^*$ and $\x_2^*$ denote the optimal solutions of the problems~\eqref{EQ-1} and \eqref{EQ-2}, respectively. First, one can see that $\x_2^*$ is feasible to the problem~\eqref{EQ-1}, and hence $f(\x_1^*)\leq f(\x_2^*)$. Next, we prove that $\x_1^*$ is also feasible to the problem~\eqref{EQ-2} as follows:
+
+	For any $\bar{\boldsymbol{\delta}}\in\operatorname{Conv}(\boldsymbol{\delta}^1,\ldots,\boldsymbol{\delta}^N)$, there exists $\lambda_i\geq 0, i=1,\ldots,N$, satisfying $\sum_{i=1}^N\lambda_i=1$ such that $\bar{\boldsymbol{\delta}}=\sum_{i=1}^N\lambda_i \boldsymbol{\delta}^i$. Then, we have
+	\begin{flalign}\label{key} \nonumber
+		&g({\x_1^*},\bar{\boldsymbol{\delta}})=\\
+		&g(\x_1^*,\sum_{i=1}^N\lambda_i \boldsymbol{\delta}^i)\leq \sum_{i=1}^N\lambda_ig(\x_1^*, \boldsymbol{\delta}^i) \leq\sum_{i=1}^N\lambda_i 0=0 ,
+	\end{flalign}
+	where the first inequality given by the convexity of $g(\x,\boldsymbol{\delta})$ in $\boldsymbol{\delta}$, and the second inequality is obtained by the feasibility of $\x_1^*$ to the problem~\eqref{EQ-1}. Therefore, $\x_1^*$ is feasible to the problem~\eqref{EQ-2} and, accordingly, $f(\x_2^*)\leq f(\x_1^*)$, which concludes the proof.
+\end{proof}
+\begin{cor}\label{thm-1}
+	Problem~\eqref{Eq:SA} is equivalent to the following optimization problem:
+	\begin{flalign}\label{Eq:SA-Conv}
+		&\min \alpha, \quad \st : \nonumber\\
+		&-I \preceq \Pi(\boldsymbol{\delta}) \preceq \alpha I ~, \; \forall \boldsymbol{\delta}\in \operatorname{Conv}(\boldsymbol{\delta}^1,\ldots,\boldsymbol{\delta}^N).
+	\end{flalign}
+\end{cor}
+\subsection{Model-free approach}
+This section is one of the main contributions of this study where a new constraint removal scheme is proposed. The main idea is to focus on the structure of random variables only.
+An optimal technique of removing constraints is to discard those that lead to the largest possible improvement of the objective function.
+
+Consider the optimization problem of the form~(\ref{Eq:SA}) with the feasible region
+\begin{eqnarray}\label{eq:rand}
+	\operatorname{Conv}(\boldsymbol{\delta}^1,\ldots,\boldsymbol{\delta}^N).
+\end{eqnarray}
+Dropping the $j$th constraint yields the feasible region
+\begin{eqnarray}\label{key}
+	\operatorname{Conv} (\boldsymbol\delta^1,\boldsymbol\delta^2,\ldots,\boldsymbol\delta^{j-1}, \boldsymbol\delta^{j+1}\ldots,\boldsymbol\delta^N).
+\end{eqnarray}
+
+Figure~\ref{fig:test1} illustrates an example of the convex hull for random variables in Eq.~(\ref{eq:rand}), where all the points inside of the convex hull can be represented by the convex combination of other random variables. According to Corollary~\ref{thm-1}, if we remove a point inside of the convex hull such as the point $C$, then the feasible region of $ \boldsymbol{\delta} $ does not change. However, removing the points located at vertices, such as $A$ and $B$, may improve the objective function. An indirect way for dropping $k$ vertices is to discard the $k$ points that make the maximum-volume convex hull, which further reduces the computation time of finding all the vertices. For this purpose, the volume is approximated by calculating the distances of the points from the sample mean $\bar{\boldsymbol\delta}$, and $ k $ points with the largest distance are removed.
+
+However, Figs.~\ref{fig:test2} and \ref{fig:test3} show that the point $B$ has a larger distance from the sample mean in comparison to the point $A$, and hence removing the point $A$ makes the convex hull's volume smaller than when the point $B$ is removed. To overcome this issue, the points are selected that have the greatest distances from the sample mean $\bar{\boldsymbol\delta}$ and the other points (i.e., in this case, point $A$ should be dropped). Furthermore, the distances of each random variable $\boldsymbol\delta_i$, $ i=1,\ldots,N $, from the sample mean $\bar{\boldsymbol\delta}$ is defined by
+\begin{equation}\label{key}
+	d_i= \sqrt{\sum_{i=1}^{N} (\boldsymbol\delta_i-\bar{\boldsymbol\delta})^T(\boldsymbol\delta_i-\bar{\boldsymbol\delta})}
+	, \quad  i=1,\ldots,N ,
+\end{equation}
+and from the other random variables  is defined by
+\begin{equation}\label{key}
+	d_{ij}= \sqrt{\sum_{i=1}^{N} \sum_{j=1}^{N} (\boldsymbol\delta_i-\boldsymbol\delta_j)^T(\boldsymbol\delta_i-\boldsymbol\delta_j)}
+\end{equation}
+for $ i,j=1,\ldots,N $.
+
+Moreover, let the binary variable $y_i=\{0,1\}$, $ i=1,\ldots,N $, be defined such that $y_i=1$ when the constraint $i$ is selected to be dropped. Also, let the binary variable  $y_{ij}=\{0,1\}$, $ i,j=1,\ldots,N $, and hence $y_{ij}=1$ when both constraints $i$ and $j$ are selected to be removed. Using the above definitions, one can write the mathematical formulation for this method as
+\begin{flalign}\label{key-1}
+	&\max \; \sum_{i=1}^{N} \sum_{j=1}^{N} d_{ij}y_{ij}+ \sum_{i=1}^{N} d_{i}y_{i}, \quad \nonumber \\
+	&\st: \; \sum_{i=1}^{N}y_i \leq k, \nonumber \\
+	&y_{ij} \leq y_i, \; \forall i=1,\ldots,N, \nonumber \\
+	&y_{ij} \leq y_j, \; \forall j=1,\ldots,N, \nonumber \\
+	&y_i, y_{ij}\in \{0,1\}, \; \forall i,j=1,\ldots,N.
+\end{flalign}
+
+
+It is computationally challenging to solve the problem~\eqref{key-1} since it associated with many binary variables. Thus, its relaxation problem can be considered as follows:
+\begin{flalign}\label{CC_{IR}}
+	&\max \; \sum_{i=1}^{N} \sum_{j=1}^{N} d_{ij}y_{ij}+ \sum_{i=1}^{N} d_{i}y_{i}, \nonumber \\
+	&\st :\; \sum_{i=1}^{N}y_i \leq k, \nonumber \\
+	&y_{ij} \leq y_i, \; \forall i=1,\ldots,N, \nonumber \\
+	&y_{ij} \leq y_j, \; \forall j=1,\ldots,N, \nonumber \\
+	&0 \leq y_i \leq 1, \; \forall i=1,\ldots,N.
+\end{flalign}
+
+We suppose that the relaxed values of $y_i$, $ i=1,\ldots,N $, obtained by the problem~(\ref{CC_{IR}}) indicate the probability of discarding the constraint $i$.
+Therefore, the procedure consists of solving the relaxed problem~(\ref{Eq:BMSP}), sorting the values of $y_i$, and removing the first $ k $ corresponding constraints from the problem~(\ref{Eq:SA}). This procedure only depends on the samples of the random variables for removing constraints and does not exploit the structure of the target optimization problem.
+
+
+
+\begin{figure*}[t]
+	\centering
+	\subfigure[]{\includegraphics[width=.3\linewidth]{images/test1}\label{fig:test1}}
+	\subfigure[]{\includegraphics[width=.3\linewidth]{images/test2}\label{fig:test2}}
+	\subfigure[]{\includegraphics[width=.3\linewidth]{images/test3}\label{fig:test3}}
+	\caption{ (a) Convex hull of random variables (b) Discarding point $B$ (c) Discarding point $A$.}
+\end{figure*}
+\subsection{Model-based approach} \label{sect:sect5}
+A model-based approach is proposed herein by using the relaxation of the integer variables in the MISDP problem~(\ref{Eq:integer}). This approach not only uses the random data information but also the structure of the optimization model.
+
+As a matter of fact, consider a case wherein the two points $ A $ and $ B $ have the same distance from the sample mean and from all the other points with different objective values. The previous method fails to decide in removing the proper constraints based on only possessing the information of the data. If we assume that dropping the point $ A $ can make more improvement in terms of the objective value in comparison to dropping the point $ B $, then the new approach drops the point $ A $.
+
+The continuous relaxation of the integer variable $z$ in the MISDP problem~(\ref{Eq:integer}) results in the following SDP problem:
+\begin{flalign}\label{Eq:BMSP}
+	\min \alpha, \nonumber\\
+	\st: & \Pi(\boldsymbol{\delta}^i)+M_1z_i \succeq -I \; \forall i=1,\ldots,N,\nonumber\\
+	&\Pi(\boldsymbol{\delta}^i)-M_2z_i \preceq \alpha I \; \forall i=1,\ldots,N,\nonumber\\
+	& \sum_{i=1}^{N}z_i \leq k ,\nonumber\\
+	&0 \leq z_i \leq 1, \; \forall i=1,\ldots,N.
+\end{flalign}
+This method considers some weights as information of the model structure that are obtained from the relaxation of the chance-constrained problem~(\ref{Eq:BMSP}). In other words, if two points $i$ and $j$ have the same distance from all other points and from the sample mean, then the one that makes more improvement to the objective value will be chosen. Consequently, both the structure of the model and the random data play the main roles for choosing proper removal constraints.
+
+This technique adjusts the mathematical model~(\ref{CC_{IR}}) as
+\begin{eqnarray}\label{key}
+	&&\max \; \sum_{i=1}^{N} \sum_{j=1}^{N} d_{ij}w_{ij}y_{ij}+ \sum_{i=1}^{N} d_{i}y_{i}, \nonumber \\
+	&&\st \; \sum_{i=1}^{N}y_i \leq k,\nonumber \\
+	&&\sum_{i=1}^{N}y_{ij} = ky_j, \; \forall j=1,\ldots,N, \nonumber\\
+	&&y_{ij} \leq y_i, \; \forall i,j=1,\ldots,N, \nonumber\\
+	&&y_{ij} \leq y_j, \; \forall i,j=1,\ldots,N, \nonumber\\
+	&&0 \leq y_i \leq 1, \; \forall i=1,\ldots,N,
+\end{eqnarray}
+where $w_{ij}=z_iz_j$ is given by the SDP problem~(\ref{Eq:BMSP}) as an approximation of the MISDP problem~(\ref{Eq:integer}).
+
+
+\section{Numerical Examples} \label{sect:sect6}
+The performance of each chance-constraint approximation methods is compared in terms of computational time and objective values for stabilizing a second order mass-spring-damper with two delayed states as an illustrative example.
+All the experiments are carried out by using MATLAB R2018a on a desktop computer with Intel Core\textsuperscript{TM} i7-3630QM $ @ $ 2.40 GHz and 8.0 GB of RAM and Windows 10 operating system. All the optimizations are performed by using \texttt{CVX 2.1} with the semidefinite program solver \texttt{MOSEK}.
+
+
+\begin{exmp}\label{ex:1}
+	Consider the following delayed oscillator with a control input, so-called Hsu-Bhatt:
+	\begin{equation}\label{eq:ex1}
+		\ddot{x}(t)+c \dot x(t)+k x(t)=b x(t-\tau)+ u(t),
+	\end{equation}
+	The stability chart in the parameter place $ k-b $ has a well-known pattern (cf. \cite{Insperger2002semi,Butcher2016tdsbook}), which is often used for analyzing the performance of different control algorithm\cite{Insperger2011semi,Butcher2016tdsbook,Dabiri2015explicit,Butcher2016transition}. This system can be written in the form of Eq.~(\ref{Eq:DDE}) where
+	\begin{flalign}\label{eq:ex1ss} \nonumber
+		A=&\begin{bmatrix}
+			0  & 1  \\
+			-k & -c
+		\end{bmatrix}+\Delta A
+		, \;
+		A_d=\begin{bmatrix}
+			0 & 0 \\
+			b & 0
+		\end{bmatrix}+\Delta A_d
+		,\;
+		\\
+		B=&\begin{bmatrix}
+			0 &
+			1
+		\end{bmatrix}^T.
+	\end{flalign}
+	and $ \Delta A $ and $ \Delta A_d $ are associated with random variables $ \psi_i= \rho_i\mathcal N(0,1) $, $ i=1,2,3 $, as
+	\begin{eqnarray}\label{key}
+		\Delta A= \begin{bmatrix}
+			0      & 0      \\
+			\psi_1 & \psi_2 \\
+		\end{bmatrix}, \;
+		\Delta A_d=\begin{bmatrix}
+			0      & 0 \\
+			\psi_3 &   \\
+		\end{bmatrix}.
+	\end{eqnarray}
+
+
+	, and the feedback controller
+	\begin{equation}\label{key}
+		u(t)= \int_{t-\tau}^{t}k_1(\theta-t) x(\theta) +k_2(\theta-t) \dot x(\theta)\;d\theta.
+	\end{equation}
+
+	Without loss of generality, $ c=-1 $, $ k=-1 $, $ b=1 $, $ \tau=1 $, $ \boldsymbol{\phi}(\theta)=[t,1]^T $, $ -\tau \leq \theta \leq 0 $, and $ \rho_i=\rho $ for $ i=1,2,3$. One can check that the solution of the uncontrolled system is unstable for any initial function and any values of $ \rho $.
+
+
+	We consider five different sample sizes $ N=\{10,20,50,100,200\} $ and a perturbation level $\rho=0.1$. In addition, according to Theorem~\ref{thm:DDE}, ten shifted-CGL points ($ N=20 $) are used to approximate the time-delay LTI system~(\ref{eq:ex1}) by the abstract LTI system~(\ref{eq:DDEAbs}). Finally, Theorem~\ref{thm:lti} is used to tune the unknown discretized value of the kernel gain as the memory of the state feedback control in Eq.~(\ref{Eq:feedbackcntrlmemory}). The chance-constraint semidefinite optimization problem of this example is solved by following Theorem~\ref{thm:lti} and using four different scenario-based chance-constraint approximations: the scenario, greedy, model-free and model-based techniques.
+
+
+	The proposed model-free and model-based approaches solve one and two semidefinite optimization problems in the form of Eq.~(\ref{Eq:SA}), respectively. However, the Greedy approach is not computationally efficient since it solves $1+ \sum_{i=1}^{k} n_i$ semidefinite optimization problems, where $n_i$ denotes the number of active constraints in each iteration $i$.
+
+	Table~\ref{tab:Data1_1} shows the computation time (CT) and the obtained objective value ($ \alpha $) of the proposed approaches for different total number of scenarios $ N =\{10,20,50,200,500,1000\}$, and the number of removal scenarios $ k = 0.1N$ when $ \rho=1 $. It is shown that the Greedy approach not only has the maximum computation time in comparison to the others, but also its computation time increases exponentially by increasing the number of scenarios. Indeed, the computation time of the model-free and model-based approaches are about $ 100 $ and $ 70 $ times faster than that of the Greedy approach, respectively. Moreover, the Greedy approach could not obtain the optimal solution for $ 200 $ samples in two days of running, and hence it was terminated. On the other hand, Table~\ref{tab:Data1_1} shows that in terms of the solution quality and optimality, the proposed model-free and model-based techniques work better than the Greedy approach, as well as much better than the scenario approach.
+
+
+	\begin{table*}[]
+
+		\caption{Computation time (CT) and the objective value ($ \alpha $) of the chance-constrained semidefinite methods.}
+		\centering % centering table
+		\resizebox{0.75\textwidth}{!}{
+			\begin{tabular}{c}
+				\begin{tabular}{lp{1 cm}cccccccc} % creating 10 columns
+					%             \specialrule{.1em}{.05em}{.05em} 
+					      &       & \multicolumn{2}{c}{Scenario} & \multicolumn{2}{c}{Greedy} & \multicolumn{2}{c}{model-free} & \multicolumn{2}{c}{model-based}                                           \\
+					\cmidrule(lr){3-4}\cmidrule(lr){5-6}\cmidrule(lr){7-8}\cmidrule(lr){9-10}
+					$ N $ & $ k $ & $ \alpha $                   & CT                         & $ \alpha $                     & CT                              & $ \alpha $ & CT    & $ \alpha $ & CT    \\
+					\cmidrule(lr){1-1}\cmidrule(lr){2-2}\cmidrule(lr){3-3}\cmidrule(lr){4-4}\cmidrule(lr){5-5}
+					\cmidrule(lr){6-6}\cmidrule(lr){7-7}\cmidrule(lr){8-8}\cmidrule(lr){9-9}\cmidrule(lr){10-10}
+					%             \celldef{6}\\
+					%            \midrule \midrule
+					%             \multicolumn{11}{c}{$ \rho=1 $}
+					%             \\
+					%             \midrule \midrule
+					10    & 1     & -0.0045                      & 0.006                      & -0.0049                        & 0.081                           & -0.0046    & 0.011 & -0.0049    & 0.018 \\
+					20    & 2     & -0.0044                      & 0.014                      & -0.0046                        & 0.4040                          & -0.0045    & 0.038 & -0.0045    & 0.075 \\
+					50    & 5     & -0.0044                      & 0.035                      & -0.0044                        & 8.84                            & -0.0044    & 0.038 & -0.0045    & 0.075 \\
+
+					200   & 20    & -0.0035                      & 0.17                       & *                              & *                               & -0.0035    & 0.15  & -0.0040    & 0.38  \\
+					500   & 50    & -0.0030                      & 0.52                       & *                              & *                               & -0.0030    & 0.95  & -0.0039    & 2.02  \\
+					1000  & 100   & -0.0024                      & 1.74                       & *                              & *                               & -0.0024    & 1.44  & -0.0039    & 3.03  \\
+					%            \midrule \midrule
+					%             \multicolumn{11}{c}{$ \rho=2 $}
+					%             \\
+					%             \midrule \midrule
+					%            & 10 & 1 & -0.6456 & 0.06 & -0.6459 & 1.29 & -0.7450 & 0.05 & -0.7450 & 0.11 \\
+					%            & 20 & 2 & -0.3921 & 0.16 & -0.4230 & 8.96 & -0.4338 & 0.13 & -0.4338 & 0.29 \\
+					%            & 50 & 5 & -0.1958 & 0.60 & -0.3126 & 99.12 & -0.3126 & 0.70 & -0.3126 & 1.28 \\
+					%            & 200 & 20 & -0.1790 & 2.6 & * & * & -0.2388 & 2.7 & -0.2369 & 7.4 \\
+					\specialrule{.1em}{.05em}{.05em}
+				\end{tabular}
+			\end{tabular}
+		}
+		\label{tab:Data1_1}
+	\end{table*}
+
+
+
+	Let $ \rho =1 $ and the uncertainty matrices be
+	\begin{eqnarray}\label{eq:ex1r} \nonumber
+		\Delta A&=& \begin{bmatrix}
+			0      & 0      \\
+
+			0.2908 & 0.1129
+		\end{bmatrix},
+		\\
+		\Delta A_d&= &\begin{bmatrix}
+			0      & 0      \\
+			0.4400 & 0.1017
+		\end{bmatrix} .
+	\end{eqnarray}
+	In addition the initial function is $ \boldsymbol{\phi}(\theta)=[1,0]^T $, $ -\tau\leq \theta \leq 0 $ in which $ \tau=2 $ sec.
+	Three controllers obtained by the model-based approach for the number of samples 10, 20, and 50. Figure~\ref{fig:res} shows the asymptotically stable response of the controlled time-delay system~(\ref{eq:ex1ss}).
+
+	\textcolor{red}{To evaluate the performance of the designed controller, the uncertain time-delay LTI system in Eq.~(\ref{Eq:uDDE}) with system matrices in Eq.~(\ref{eq:ex1ss}) are simulated 100 times with different random uncertain matrices in Eq.~(\ref{eq:ex1r}). It was observed that the system was stabilized 100\% in all the simulations.}
+	\begin{figure}[t]
+		\centering %main1_pplott1
+		\includegraphics[width=0.95\linewidth]{images/res}
+		\caption{The controlled response of the time-delay system~(\ref{eq:ex1ss}) by feedback control law with memory designed by the use of model-based with 10 (red lines), 20 (blue lines), and 50 (black lines), and using 10 CGL collocation points. The solid and dashed lines represent $ x_1(t) $ and $ \dot x_1(t) $, respectively.}
+		\label{fig:res}
+	\end{figure}
+	It is worthy of mention that although our numerical study is conducted on a semidefinite optimization problem in control theory, the methodology of constraint removal can be applied to solve a wide range of other practical chance-constrained problems.
+\end{exmp}
+\section{Conclusion} \label{sect:con}
+Time-delay systems are an important class of dynamical systems whose governing equations are represented by delay differential equations. Indeed, many practical control problems can be described as time-delay systems.
+Despite time-delay systems' importance in all areas of science with many practical applications, designing a controller for them is more challenging than that for non-delay dynamical systems.
+Indeed, when it comes to including uncertainties in the time-delay modeling not many mature techniques are available. In addition, the application of using linear matrix inequality (LMI) techniques in control problems has received a lot of attention due to their robust property.
+Several linear matrix inequality (LMI)-based techniques have been developed for linear time-invariant uncertain time-delay systems, however, the feedback controller was chosen memoryless with a constant gain matrix. Considering that feedback control laws with memory can potentially add an infinite number of eigenvalues to the system, developing a technique for this purpose is an interesting control problem. In this paper, two new scenario-based approaches with constraint removal techniques were proposed to design optimal feedback control law with memory for LTI uncertain time-delay systems to robustly asymptotically stable them for the most of the admissible uncertainty outcomes.
+Thus, the equivalent functional differential equation is obtained in a Banach space where its solution operator can be obtained by discretizing that at Gauss-Lobatto-Chebyshev collocation points. The result of discretization is a system of abstract linear ordinary differential equations with a memoryless feedback control, which can be optimized by the proposed methods.
+In an illustrative example, it was shown that the proposed techniques can successfully and efficiently stabilize a linear second-order time-delay system with a feedback control law with distribution delay.
+In addition, it was shown that the proposed removal constraint approaches (i.e. model-based and model-free approaches) are more efficient than the available methods such as the Greedy approach especially for a large number of samples.
+
+
+
+\section*{ACKNOWLEDGMENT}
+This research has been supported in part by the Bisgrove Scholars program (sponsored by Science Foundation Arizona).
+
+\bibliographystyle{ieeetr}
+\bibliography{GeneralBib_2019_05_21}
+
+%	\bibliographystyle{ieeetr}
+%%	\printbibliography
+%\bibliography{bib_mypapers,bib_fractional,bib_delay,bib_impact}
+
+
+
+%
+%
+%\begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{images/ad}}]{Arman Dabiri}
+%	is a PhD candidate at the Aerospace and Mechanical Engineering department, University of Arizona. He received his MSc and BSc. degrees in mechanical engineering from K. N. Toosi University of Technology, Tehran, Iran, in 2011 and 2008, respectively. His research interests include dynamics and control in time-periodic, time-delayed, and fractional-order systems; multibody dynamics; robotics; mechatronics; and microelectromechanical systems. He is currently member of ASME and IEEE society.
+%\end{IEEEbiography}
+%
+%\begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{images/eb}}]{Eric A. Butcher}
+%	is an associate professor in the Aerospace and Mechanical Engineering
+%	department at the University of Arizona. He obtained M.S. and Ph.D. degrees in
+%	mechanical engineering from Auburn University and a M.S. in Aerospace
+%	Engineering Sciences from the University of Colorado at Boulder. His research interests include
+%	astrodynamics; spacecraft guidance, navigation, and control; nonlinear dynamics and
+%	vibrations; and stability, control, and estimation in time-periodic, time-delayed,
+%	stochastic, and fractional systems. He has coauthored over 180 refereed book chapters,
+%	journal, and conference papers.
+%	
+%\end{IEEEbiography}
+%
+%
+%\begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{images/mp}}]{Mohammad Poursina}
+%	received his BSc and MSc degrees in Mechanical Engineering from the University of Tehran in 2003, and 2006, respectively. He then joined the Mechanical Engineering Department at Rensselaer Polytechnic Institute (RPI) in 2007 and graduated with PhD degree in 2011. He also served as a postdoctoral research associate and lecturer for two years at RPI. He was a visiting scholar at the Simbios: NIH Center for Biomedical Computations at Stanford University. He is currently an assistant professor in the Department of Aerospace and Mechanical Engineering at the University of Arizona. His research interests include computational multibody dynamics, robotics, fractional order systems, and multiscale simulations of biopolymers. 
+%\end{IEEEbiography}
+%
+%\begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{images/mn}}]{Morad Nazari}
+%%	received the B.S. degree in mechanical engineering from Amirkabir University of Technology, Tehran, Iran, in 2005, the M.S. degree in applied mechanics from that university in 2008, and Ph.D. degree in aerospace engineering from New Mexico State University, Las Cruces, New Mexico, in 2013. He is currently a postdoctoral research associate at the Aerospace and Mechanical Engineering department, University of Arizona. His research interests include fractional order systems, spacecraft attitude control, geometric control, and astrodynamics.
+% is an Assistant Professor with the department of Aerospace Engineering at Embry-Riddle Aeronautical University, Daytona Beach, FL. He was a research associate with the department of Aerospace and Mechanical Engineering at the University of Arizona in 2014-2015 and 2016-2017 academic years. He received his doctoral degree in Aerospace Engineering from New Mexico State University in 2013 and his MSc and BSc degrees in Mechanical Engineering from Amirkabir University of Technology in 2008 and 2005. His research interests include stability and control of time-varying space systems, fractional order control, and geometric mechanics. He is currently member of AIAA, ASME, SIAM, and Alpha Chi national honor society.
+%\end{IEEEbiography}
+\end{document}

@@ -1,0 +1,142 @@
+
+%%%%% =============== {Define Theorem} ==============================
+\theoremstyle{plain}
+\newtheorem{lem}{Lemma}[section]
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{prop}{Proposition}[section]
+\newtheorem{cor}{Corollary}[section]
+\newtheorem{property}{Property}[section]
+
+\theoremstyle{definition}
+\newtheorem{defn}{Definition}[section]
+\newtheorem{conj}{Conjecture}[section]
+\newtheorem{exmp}{Example}[section]
+\newtheorem{expl}{Explanation}[section]
+
+\theoremstyle{remark}
+\newtheorem{rem}{Remark}[section]
+
+
+%%%%% =============== {Define constants} ==============================
+\def \P {\mathpzc{P}}
+\def \k {\mathpzc{k}}
+\def \h {\mathpzc{h}}
+\def \Do {\mathbb{D}}
+\def \w {\mathpzc{w}}
+\def \L {\mathpzc{L}}
+\def \J {\mathpzc{J}}
+\def \D {\mathcal{D}}
+\def \Dc {\partial}
+\def \Jc {{{J}}}
+\def \d {\mathcal{D}}
+\def \e {\mathcal{E}}
+\def \f {\mathcal{F}}
+\def \j {\mathcal{J}}
+\def \i {\mathbb{i}}
+\def \EXP {\mathbb{EXP}}
+
+\newcommand{\jac}{\ensuremath{J_n^{\alpha,\beta}(x)}}
+\newcommand{\jacf}{\ensuremath{J_n^{\alpha,\beta,\mu}(x)}}
+
+\newcommand\eqq{\mathrel{\stackrel{\makebox[0pt]{\mbox{\normalfont\tiny def}}}{=}}}
+\newcommand\eqdef{\mathrel{\overset{\makebox[0pt]{\mbox{\normalfont\tiny\sffamily def}}}{=}}}
+\newcommand\defeq{\eqdef}
+\newcommand\deq{\mathrel{\overset{\makebox[0pt]{\mbox{\normalfont\tiny\sffamily def}}}{=}}}
+
+
+
+\newcommand{\para}[1]{\langle{#1}\rangle} 
+\newcommand{\parp}[1]{\left({#1}\right)} 
+\newcommand{\parb}[1]{\left[{#1}\right]} 
+\newcommand{\parB}[1]{\left\lbrace #1 \right\rbrace} 
+\newcommand{\ceil}[1]{\lceil{#1}\rceil} 
+\newcommand{\floor}[1]{\lfloor{#1}\rfloor} 
+
+
+\newcommand {\Discn} {{\mathpzc d}}
+\newcommand {\Disc}[1] {{{\mathpzc d}_{\mathbf t_{#1} }}}
+\newcommand {\DDisc}[1] {{{\mathpzc d}_{\mathbf z_{#1} }}}
+\newcommand {\disc }{{{\mathpzc d}_{\mathbf t }}}
+
+\newcommand{\Oe}{\ensuremath{\Theta^N_{\exp{(\cdot)}}(i \Omega t)}}
+\newcommand{\Oee}{\ensuremath{\Theta^N_{\exp{(\cdot)}}(i \frac{\Omega}{2} t)}}
+\newcommand{\fo}{\ensuremath{\text{diag}\parp{\Theta_{(\cdot)^{2}}^N (i)}}}
+\newcommand{\OM}[2]{\ensuremath{\mathcal{O}_{\mathbf #1_N }\parp{#2}}}
+\newcommand{\OF}[1]{\ensuremath{\mathfrak{T}\parB{\mathbf #1}}}
+\newcommand{\OFr}[1]{\ensuremath{\mathfrak{T}_R\parB{\mathbf #1}}}
+\newcommand{\Odd}{\ensuremath{\text{diag}\parp{ \Theta_{(\cdot)^{2}}^N (i)}}}
+\newcommand{\Od}{\ensuremath{\text{diag}\parp{ \Theta_{(\cdot)^{}}^N (i)}}}
+\newcommand{\Oa}{\ensuremath{\text{diag}\parp{ \Theta_{(\cdot)^{\alpha}}^N (i)}}}
+
+\newcommand{\CS}[3]{\ensuremath{\mathbf{#1}_N^T \parp{#2}\mathbf{CS}_N(#3)}}
+
+\newcommand{\Rt}[1]{\ensuremath{\left[\begin{array}{cc}
+			\cos(#1) & -\sin(#1) \\
+			\sin(#1) & \cos(#1) \\
+		\end{array}\right]}}
+
+
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+		\node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
+
+
+%%%%% =============== {Define Highlights} ==============================
+\newcommand{\txtr}[1]{{\color{red!50}{#1}}}
+\newcommand{\txtb}[1]{{\color{blue!50}{#1}}}
+\newcommand{\txtg}[1]{{\color{green!50!black}{#1}}}
+
+\newcommand{\hlr}[1]{\colorbox{red!50}{$\displaystyle\text{#1}$}}
+\newcommand{\hlg}[1]{\colorbox{green!50}{$\displaystyle\text{#1}$}}
+\newcommand{\hlb}[1]{\colorbox{blue!50}{$\displaystyle\text{#1}$}}
+\newcommand{\hlG}[1]{\colorbox{gray!80}{$\displaystyle\text{#1}$}}
+\newcommand{\textoverbrace}[2]{$\overbrace{\text{#1}}^{\text{#2}}$}
+
+\newcommand{\HLr}[1]{\colorbox{red!50}{$\displaystyle#1$}}
+\newcommand{\HLg}[1]{\colorbox{green!50}{$\displaystyle#1$}}
+\newcommand{\HLb}[1]{\colorbox{blue!50}{$\displaystyle#1$}}
+\newcommand{\HLG}[1]{\colorbox{gray!50}{$\displaystyle#1$}}
+
+\def \e {{\mathbf{e}}}
+\def \r{\mathbf{r}}
+\def \x{\mathbf{x}}
+\def \f{\mathbf f}
+\def \g{\mathbf g}
+\def \u{\mathbf u}
+\def \h{\mathbf h}
+\def \y{\mathbf y}
+\def \v{\mathbf v}
+\def \z{\mathbf z}
+
+\newlength\mylen
+\settoheight{\mylen}{$\bigg)$}
+\newcommand\bigbang{\vcenter{\hbox{\resizebox{!}{1.6\mylen}{!}}}}
+
+
+\usepackage{forest}
+\usetikzlibrary{arrows.meta, shapes.geometric, calc, shadows}
+
+\colorlet{mygreen}{green!75!black}
+\colorlet{col1in}{red!30}
+\colorlet{col1out}{red!40}
+\colorlet{col2in}{mygreen!40}
+\colorlet{col2out}{mygreen!50}
+\colorlet{col3in}{blue!30}
+\colorlet{col3out}{blue!40}
+\colorlet{col4in}{mygreen!20}
+\colorlet{col4out}{mygreen!30}
+\colorlet{col5in}{blue!10}
+\colorlet{col5out}{blue!20}
+\colorlet{col6in}{blue!20}
+\colorlet{col6out}{blue!30}
+\colorlet{col7out}{orange}
+\colorlet{col7in}{orange!50}
+\colorlet{col8out}{orange!40}
+\colorlet{col8in}{orange!20}
+\colorlet{linecol}{blue!60}
+
+	\pgfkeys{/forest,
+		rect/.append style={rectangle, rounded corners=2pt, inner color=col6in, outer color=col6out},
+		ellip/.append style={ellipse, inner color=col5in, outer color=col5out},
+		orect/.append style={rect, font=\sffamily\bfseries\LARGE, text width=325pt, text centered, minimum height=10pt, outer color=col7out, inner color=col7in},
+		oellip/.append style={ellip, inner color=col8in, outer color=col8out, font=\sffamily\bfseries\large, text centered},
+	}
